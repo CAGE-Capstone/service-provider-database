@@ -10,3 +10,5 @@ ella: HEY GUYYYS!! My favorite food right now is anything chinese food related.
 
 Gabby - I actually don't really watch tv
 
+
+Jordan: The Traitors
