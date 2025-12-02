@@ -10,6 +10,7 @@ app = Flask(__name__)
 ALL_DATA = []
 HEADERS = []
 CATEGORIES = []
+# NOTE: The actual data file must be in the same directory as this script.
 CSV_FILE_NAME = 'CapstoneSpreadsheet - Sheet1.csv'
 
 # Column indices
@@ -98,16 +99,46 @@ def load_data():
         ALL_DATA = []
 
 
+# --- Helper function for filtering out "closed" resources ---
+def is_valid_resource(row):
+    """Checks if the row is a valid resource and does not contain 'closed' in the name."""
+    if len(row) > NAME_COL_INDEX:
+        col_a_value = row[NAME_COL_INDEX].strip()
+        if col_a_value != '' and col_a_value.upper() != 'NAME':
+            # Check for "closed" (case-insensitive) in the name column
+            if "closed" not in col_a_value.lower():
+                return True
+    return False
+
+
+# --- Map Resource Rows to their Original Index ---
+def get_resource_rows_with_index(data):
+    """
+    Returns a list of tuples: (original_row_index, row_data)
+    Includes only rows that are actual resources, excluding those marked 'closed'.
+    """
+    resource_map = []
+    for i, row in enumerate(data):
+        if is_valid_resource(row):
+            resource_map.append((i, row))
+    return resource_map
+
+
+# ----------------------------------------------------------------
+
 def category_block_search(query, data):
-    """Filters by the category block structure (used by the category buttons)."""
+    """
+    Filters by the category block structure, returning (original_row_index, row_data),
+    and excludes resources containing 'closed'.
+    """
     if not query or not data:
         return []
 
     user_query = query.upper().strip()
-    filtered_rows = []
+    filtered_rows_with_index = []
     in_matching_block = False
 
-    for row in data:
+    for i, row in enumerate(data):
         col_d_value = row[CATEGORY_COL_INDEX].upper().strip() if len(row) > CATEGORY_COL_INDEX else ''
         col_a_value = row[NAME_COL_INDEX].upper().strip() if len(row) > NAME_COL_INDEX else ''
 
@@ -123,67 +154,65 @@ def category_block_search(query, data):
                 in_matching_block = False
 
         elif in_matching_block:
-            # We are inside the matching category block.
-            if col_a_value != '' and col_a_value != 'NAME' and col_a_value != 'DETAILS:':
-                filtered_rows.append(row)
+            # We are inside the matching category block AND it must be a valid resource
+            if is_valid_resource(row):
+                # Return the index of the row and the row data
+                filtered_rows_with_index.append((i, row))
 
-    return filtered_rows
+    return filtered_rows_with_index
 
 
 def keyword_search(query, data):
     """
-    Performs a full-text search for the query string across all columns
-    of the resource rows.
+    Performs a full-text search, returning (original_row_index, row_data),
+    and excludes resources containing 'closed'.
     """
     if not query or not data:
         return []
 
-    # Get only the resource rows for search
-    resource_rows = []
-    for row in data:
-        if len(row) > NAME_COL_INDEX:
-            col_a_value = row[NAME_COL_INDEX].strip().upper()
-            if col_a_value != '' and col_a_value != 'NAME':
-                resource_rows.append(row)
+    # Get only the valid resource rows for search with their index
+    resource_rows_map = get_resource_rows_with_index(data)
 
     # Normalize search query
     search_term = query.upper().strip()
 
-    matching_rows = []
+    matching_rows_with_index = []
 
-    for row in resource_rows:
+    for index, row in resource_rows_map:
         row_text = " ".join(row).upper()
 
         # Check for the search term as a whole word (using word boundaries \b)
         if re.search(r'\b' + re.escape(search_term) + r'\b', row_text):
-            matching_rows.append(row)
+            # is_valid_resource check is already done in get_resource_rows_with_index
+            matching_rows_with_index.append((index, row))
 
-    return matching_rows
+    return matching_rows_with_index
 
 
-def build_table_html(values, headers):
-    """Generates the HTML string for the results table."""
+# --- Function: Generates buttons instead of a table ---
+def build_buttons_html(values_with_index):
+    """Generates the HTML string for a uniform grid of clickable service buttons."""
 
-    if not values:
-        return '<div class="loading-message">No matching resources found for this category.</div>'
+    if not values_with_index:
+        return '<div class="loading-message">No matching resources found.</div>'
 
-    html = '<table><thead><tr>'
+    html = '<div class="service-buttons-container">'
 
-    trimmed_headers = [h for h in headers if h.strip()]  # Filter out empty columns
-    for header in trimmed_headers:
-        html += f'<th>{header}</th>'
-    html += '</tr></thead><tbody>'
+    for row_index, row in values_with_index:
+        # Get the service name from the NAME_COL_INDEX
+        service_name = row[NAME_COL_INDEX].strip() if len(row) > NAME_COL_INDEX else 'Untitled Service'
 
-    for row in values:
-        html += '<tr>'
-        for cell_value in row[:len(trimmed_headers)]:
-            value = cell_value.strip() if cell_value else ''
-            html += f'<td>{value}</td>'
-        html += '</tr>'
+        # is_valid_resource check is already done in the search functions
+        if service_name:
+            detail_url = url_for('resource_detail', row_index=row_index)
+            # Use the service-button class for uniform styling
+            html += f'<a href="{detail_url}" class="service-button">{service_name}</a>'
 
-    html += '</tbody></table>'
+    html += '</div>'
     return html
 
+
+# -------------------------------------------------------------
 
 def generate_category_buttons_html(categories):
     """Generates the HTML string for the category buttons."""
@@ -206,7 +235,7 @@ def generate_keyword_list_html(keywords):
 # Load data on startup
 load_data()
 
-# HTML for the main search page (searches by keyword in service name)
+# HTML for the main search page (unchanged)
 search_page_template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -335,7 +364,7 @@ search_page_template = """
 </html>
 """
 
-# HTML for results page (/results)
+# HTML for results page (unchanged)
 results_page_template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -355,27 +384,109 @@ results_page_template = """
             color: #856404;
             border-radius: 8px;
         }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 15px; 
-            background-color: white; 
+        .error-message {
+            background-color:#f8d7da; 
+            color:#721c24; 
+            border-color:#f5c6cb;
+            padding: 15px;
+            border: 1px solid;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
-        th, td { 
-            border: 1px solid #dee2e6; 
-            padding: 12px; 
-            text-align: left; 
-            word-wrap: break-word;
+
+        /* Styling for the new button layout */
+        .service-buttons-container {
+            display: grid;
+            /* Creates 3 columns of equal size, adjusts for smaller screens */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 15px;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
         }
-        th { 
-            background-color: #e9ecef; 
-            color: #495057; 
-            text-transform: uppercase; 
-            font-size: 0.85em; 
+        .service-button {
+            /* These properties enforce uniform size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px; /* Fixed height */
+            text-align: center;
+
+            /* Styling */
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
             font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+            /* Text wrapping for long names */
+            word-break: break-word;
+        }
+        .service-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <a href="/" class="back-link">&larr; Back to Search</a>
+    <h2 id="results-title">{{ title }}</h2>
+
+    <div id="data-container">
+        {{ buttons_html | safe }} 
+    </div>
+
+</body>
+</html>
+"""
+
+# HTML for resource detail page (unchanged)
+detail_page_template = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ resource_name }} Details</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; padding: 20px; background-color: #f8f9fa; }
+        .detail-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 { color: #007bff; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: #6c757d; text-decoration: none; font-weight: 500; }
+        .back-link:hover { text-decoration: underline; }
+        .detail-item {
+            display: flex;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px dotted #e9ecef;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-header {
+            font-weight: 600;
+            color: #343a40;
+            flex: 0 0 180px; /* Fixed width for the label */
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        .detail-value {
+            color: #495057;
+            flex-grow: 1;
         }
         .error-message {
             background-color:#f8d7da; 
@@ -390,15 +501,27 @@ results_page_template = """
 <body>
 
     <a href="/" class="back-link">&larr; Back to Search</a>
-    <h2 id="results-title">{{ title }}</h2>
 
-    <div id="data-container">
-        {{ table_html | safe }} 
+    <div class="detail-card">
+        <h2>{{ resource_name }}</h2>
+        {% for header, value in details %}
+            <div class="detail-item">
+                <span class="detail-header">{{ header }}:</span>
+                <span class="detail-value">{{ value }}</span>
+            </div>
+        {% endfor %}
+
+        {% if not details %}
+            <div class="error-message">Resource details could not be loaded.</div>
+        {% endif %}
     </div>
 
 </body>
 </html>
 """
+
+
+# -------------------------------------------------------------
 
 
 # Flask Routes (pages)
@@ -421,27 +544,23 @@ def results():
     query = request.args.get('query', '').upper().strip()
     search_type = request.args.get('search_type', '').lower()
 
-    # In case csv was not cpnnected properly
     if not ALL_DATA or not HEADERS:
         title = "Data Error"
-        table_html = f'<div class="error-message">Error: Could not load data from {CSV_FILE_NAME}. Please ensure the file is present.</div>'
-        return render_template_string(results_page_template, title=title, table_html=table_html)
+        buttons_html = f'<div class="error-message">Error: Could not load data from {CSV_FILE_NAME}. Please ensure the file is present.</div>'
+        return render_template_string(results_page_template, title=title, buttons_html=buttons_html)
 
-    # Handle empty query
     if not query:
         title = "Please Enter a Search Term"
-        table_html = """<div class="loading-message">
+        buttons_html = """<div class="loading-message">
                             Please use the search bar for a keyword or a button to select a category.
                         </div>"""
-        return render_template_string(results_page_template, title=title, table_html=table_html)
+        return render_template_string(results_page_template, title=title, buttons_html=buttons_html)
 
     # Determine search method
     if search_type == 'category':
-        # Using category buttons
         filtered_data = category_block_search(query, ALL_DATA)
         search_description = "Category Block Search"
     else:
-        # Using main search bar
         filtered_data = keyword_search(query, ALL_DATA)
         search_description = "Keyword Search"
 
@@ -449,15 +568,69 @@ def results():
     title = f'Results for {search_description}: "{query}"'
 
     if not filtered_data:
-        table_html = f"""<div class="error-message">
-                           No resources found matching "{query}".
+        buttons_html = f"""<div class="error-message">
+                           No resources found matching "{query}" or all matching resources are marked 'closed'.
                         </div>"""
     else:
-        table_html = build_table_html(filtered_data, HEADERS)
+        # Use the function to generate buttons
+        buttons_html = build_buttons_html(filtered_data)
 
     # Render the results page
-    return render_template_string(results_page_template, title=title, table_html=table_html)
+    return render_template_string(results_page_template, title=title, buttons_html=buttons_html)
+
+
+@app.route('/resource/<int:row_index>')
+def resource_detail(row_index):
+    """
+    Renders a page with all details for a specific resource, omitting empty fields
+    and cleaning up header colons.
+    """
+    if not ALL_DATA or not HEADERS:
+        return render_template_string(
+            detail_page_template,
+            resource_name="Data Error",
+            details=[],
+            table_html=f'<div class="error-message">Error: Could not load data from {CSV_FILE_NAME}.</div>'
+        )
+
+    try:
+        resource_row = ALL_DATA[row_index]
+        details = []
+
+        # Iterate through headers and corresponding row values
+        for i, header in enumerate(HEADERS):
+            # 1. Check if the header exists and isn't empty
+            if i < len(resource_row) and header.strip():
+
+                # --- SOLUTION: Clean the header string ---
+                # Remove any trailing colons from the CSV header before passing it to the template.
+                clean_header = header.strip().rstrip(':')
+
+                value = resource_row[i].strip()
+
+                # 2. Check if the value is NOT empty/whitespace
+                if value:
+                    details.append((clean_header, value))
+
+        # The resource name is in the NAME_COL_INDEX
+        resource_name = resource_row[NAME_COL_INDEX].strip() if len(
+            resource_row) > NAME_COL_INDEX else "Unknown Resource"
+
+        return render_template_string(
+            detail_page_template,
+            resource_name=resource_name,
+            details=details
+        )
+
+    except IndexError:
+        return render_template_string(
+            detail_page_template,
+            resource_name="Error",
+            details=[("Status", "Resource not found (invalid index).")]
+        )
 
 
 if __name__ == '__main__':
+    # Ensure all data is reloaded before running the app
+    load_data()
     app.run(debug=True)
