@@ -629,6 +629,35 @@ def resource_detail(row_index):
             details=[("Status", "Resource not found (invalid index).")]
         )
 
+# JSON API endpoints for organizations, categories, keywords, stop words
+
+from flask import jsonify
+
+@app.route('/api/organizations')
+def api_organizations():
+    orgs = []
+    for i, row in enumerate(ALL_DATA):
+        if is_valid_resource(row):
+            orgs.append({
+                "id": i,
+                "name": row[NAME_COL_INDEX],
+                "category": row[CATEGORY_COL_INDEX],
+                "data": row  # optional: all row data
+            })
+    return jsonify(orgs)
+
+
+@app.route('/api/categories')
+def api_categories():
+    return jsonify(CATEGORIES)
+
+@app.route('/api/keywords')
+def api_keywords():
+    return jsonify(COMMON_KEYWORDS)
+
+@app.route('/api/stop_words')
+def api_stop_words():
+    return jsonify(list(STOP_WORDS))
 
 if __name__ == '__main__':
     # Ensure all data is reloaded before running the app
