@@ -4,7 +4,14 @@ import re
 import pandas as pd
 from flask import Flask, render_template_string, request, url_for
 
+# necessary for frontend to access backend
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+# allow access
+CORS(app)  # <-- allow all origins
+
 
 # data loading
 ALL_DATA = []
