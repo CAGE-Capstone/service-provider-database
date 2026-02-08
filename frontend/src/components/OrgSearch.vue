@@ -18,6 +18,7 @@
         <button
             v-for = 'cat in CATEGORIES'
             :key = 'cat'
+            @click = "clickCategory(cat)"
         >
             {{cat}}
         </button>
@@ -34,7 +35,11 @@
     const searchQuery = ref('')
 
     function searchKeyword(q) {
-    console.log("Search requested for:", q)
+        console.log("Search requested for:", q)
+    }
+
+    function clickCategory(cat) {
+        console.log("Category clicked for:", cat)
     }
 
     onMounted(async () => {
