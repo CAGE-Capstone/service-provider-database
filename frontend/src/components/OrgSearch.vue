@@ -1,7 +1,7 @@
 <template>
 
     <!-- search bar -->
-    <div>
+    <div class = 'search-bar'>
         <input
             v-model="searchQuery"
             @keyup.enter="searchKeyword(searchQuery)"
@@ -13,15 +13,15 @@
     </div>
 
     <!-- category buttons -->
-    <div>
+    <div class = 'cat-buttons'>
         <p>Filter by category</p>
-        <button
+        <router-link
             v-for = 'cat in CATEGORIES'
             :key = 'cat'
             @click = "clickCategory(cat)"
         >
-            {{cat}}
-        </button>
+            <button>{{cat}}</button>
+        </router-link>
     </div>
 
 </template>
@@ -29,13 +29,20 @@
 <script setup>
 
     import {ref, onMounted} from 'vue'
+    import {useRouter} from 'vue-router'
 
     const CATEGORIES = ref([])
 
     const searchQuery = ref('')
 
-    function searchKeyword(q) {
-        console.log("Search requested for:", q)
+    const router = useRouter()
+
+    function searchKeyword(query) {
+        if (!query) {
+            return
+        }
+
+        router.push(`results/keyword/${encodeURIComponent(query)}`)
     }
 
     function clickCategory(cat) {
