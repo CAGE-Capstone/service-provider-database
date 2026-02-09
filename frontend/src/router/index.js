@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import OrgSearch from '../components/OrgSearch.vue'
 import ResultsPage from '../components/ResultsPage.vue'
-import { Component } from 'react'
 
 const routes = [
     {
