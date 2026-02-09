@@ -15,13 +15,13 @@
     <!-- category buttons -->
     <div class = 'cat-buttons'>
         <p>Filter by category</p>
-        <router-link
+        <button
             v-for = 'cat in CATEGORIES'
             :key = 'cat'
             @click = "clickCategory(cat)"
         >
-            <button>{{cat}}</button>
-        </router-link>
+            {{cat}}
+    </button>
     </div>
 
 </template>
@@ -42,11 +42,11 @@
             return
         }
 
-        router.push(`results/keyword/${encodeURIComponent(query)}`)
+        router.push(`/results/keyword/${encodeURIComponent(query)}`)
     }
 
     function clickCategory(cat) {
-        console.log("Category clicked for:", cat)
+        router.push(`/results/category/${encodeURIComponent(cat)}`)
     }
 
     onMounted(async () => {
