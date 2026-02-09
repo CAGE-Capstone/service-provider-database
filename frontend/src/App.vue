@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>Community Service Providers</h1>
-    <OrgSearch />
+    <router-view />
   </div>
 </template>
 
