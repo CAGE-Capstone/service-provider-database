@@ -12,8 +12,6 @@ const mapUrl = ref("https://www.google.com/maps?q=Walla%20Walla,%20WA&output=emb
 const handleLocationSearch = () => {
   const q = locationQuery.value.trim();
   if (!q) return;
-
-  // encode spaces/special characters safely
   mapUrl.value = `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
 };
 
@@ -49,9 +47,8 @@ const categories = [
 
 function handleCategoryClick(key) {
   if (key === "Food") {
-    router.push("/resource/bmac-food-bank"); // TEMP: only Food goes to details page
+    router.push("/resource/bmac-food-bank"); 
   } else {
-    // optional: temporary behavior so clicks aren't "dead"
     // alert(`${key} page coming soon`);
   }
 }

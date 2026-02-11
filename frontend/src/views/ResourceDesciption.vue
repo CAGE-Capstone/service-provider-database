@@ -20,7 +20,7 @@ const scrollToSearch = async () => {
 };
 
 /**
- * TEMP demo data
+ * TEMP Data
  */
 const MOCK_RESOURCES = [
   {
@@ -172,7 +172,6 @@ function goBack() {
 </template>
 
 <style scoped>
-/* Uses the same kind of tokens you’ve been using */
 .page {
   --bg-page: #ffffff;
   --bg-header: #e7e7e7;
