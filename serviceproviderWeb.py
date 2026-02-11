@@ -5,7 +5,7 @@ import pandas as pd
 from flask import Flask, render_template_string, request, url_for
 
 app = Flask(__name__)
-
+ 
 # data loading
 ALL_DATA = []
 HEADERS = []
