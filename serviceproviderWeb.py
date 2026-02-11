@@ -643,13 +643,43 @@ from flask import jsonify
 @app.route('/api/organizations')
 def api_organizations():
     orgs = []
+    current_category = None
+    in_resource_selection = False
+
     for i, row in enumerate(ALL_DATA):
-        if is_valid_resource(row):
+        name = row[NAME_COL_INDEX].strip() if len(row) > NAME_COL_INDEX else ''
+        col_d = row[CATEGORY_COL_INDEX].strip() if len(row) > CATEGORY_COL_INDEX else ''
+
+        # 1️⃣ Detect category header rows
+        is_category_header = (
+            (col_d.startswith('Community Services-') or col_d.startswith('Community Services -') or col_d.startswith('OTHER-'))
+            and name == ''
+        )
+
+        if is_category_header:
+            # extract category name
+            if 'Community Services-' in col_d:
+                current_category = col_d.split('Community Services-')[1].strip().upper()
+            elif 'Community Services -' in col_d:
+                current_category = col_d.split('Community Services -')[1].strip().upper()
+            elif 'OTHER-' in col_d:
+                current_category = col_d.split('OTHER-')[1].strip().upper()
+
+            in_resource_section = False
+            continue
+
+        # Detect header label row (NAME DETAILS NUMBER...)
+        if name.upper() == 'NAME':
+            in_resource_section = True
+            continue
+
+        # Resource rows
+        if in_resource_section and is_valid_resource(row):
             orgs.append({
                 "id": i,
-                "name": row[NAME_COL_INDEX],
-                "category": row[CATEGORY_COL_INDEX],
-                "data": row  # optional: all row data
+                "name": name,
+                "category": current_category,
+                "data": row
             })
     return jsonify(orgs)
 
