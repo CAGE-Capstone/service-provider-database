@@ -1,7 +1,10 @@
 <script setup>
+import { useRouter } from "vue-router";
 import homepageIcon from "../assets/icons/main-image-homepage.png";
 import housingIcon from "../assets/icons/house-symbol.png";
 import { ref } from "vue";
+
+const router = useRouter();
 
 const locationQuery = ref("");
 const mapUrl = ref("https://www.google.com/maps?q=Walla%20Walla,%20WA&output=embed");
@@ -43,20 +46,47 @@ const categories = [
   { key: "Food", icon: "🍽️" },
   { key: "Employment", icon: "🧑‍💼" },
 ];
+
+function handleCategoryClick(key) {
+  if (key === "Food") {
+    router.push("/resource/bmac-food-bank"); // TEMP: only Food goes to details page
+  } else {
+    // optional: temporary behavior so clicks aren't "dead"
+    // alert(`${key} page coming soon`);
+  }
+}
 </script>
 
 <template>
   <!-- HOME PAGE -->
   <div class="page">
-      <header class="hero">
-        <!-- Language Dropdown -->
-        <div class="languageWrapper">
-          <select v-model="language" class="languageSelect">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-          </select>
-        </div>
 
+  <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="navLeft">
+      </div>
+
+      <nav class="topNav">
+        <router-link to="/" class="navLink">Home</router-link>
+
+        <a href="#" class="navLink" @click.prevent="scrollToSearch">
+          Search
+        </a>
+
+        <router-link to="/organizations" class="navLink">Organizations</router-link>
+        <router-link to="/about" class="navLink">About</router-link>
+
+        <!-- LANGUAGE DROPDOWN -->
+        <select v-model="language" class="languageSelect">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </nav>
+    </header>
+
+      <header class="hero">
+
+        <!-- Language Dropdown -->
         <div class="container heroInner">
           <div class="heroText">
 
@@ -125,7 +155,13 @@ const categories = [
           </div>
 
           <div class="grid">
-            <button v-for="c in categories" :key="c.key" class="catCard" type="button">
+            <button
+              v-for="c in categories"
+              :key="c.key"
+              class="catCard"
+              type="button"
+              @click="handleCategoryClick(c.key)"
+            >
               <div class="iconBox">
                 <img v-if="c.img" :src="c.img" :alt="c.key" />
                 <span v-else class="emoji" aria-hidden="true">{{ c.icon }}</span>
@@ -192,17 +228,45 @@ const categories = [
     </main>
   </div>
 </template>
-
+  
 <style scoped>
-
 .hero {
   position: relative;
 }
 
-.languageWrapper {
-  position: absolute;
-  top: 20px;
-  right: 40px;
+.topbar {
+  background: var(--bg-hero);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2f3e36;
+}
+
+.topNav {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.navLink {
+  text-decoration: none;
+  font-family: "Cormorant Garamond", serif;  /* MATCH TITLE */
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3e36;
+  letter-spacing: 0.4px;
+}
+
+.navLink:hover {
+  color: var(--accent);
 }
 
 .languageSelect {
