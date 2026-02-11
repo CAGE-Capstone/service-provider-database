@@ -58,7 +58,7 @@ const categories = [
 </template>
 
 <style scoped>
-/* Colors in ONE place */
+
 .page {
   --bg-page: #DBE2EF;
   --bg-header: #4fa5d8;
@@ -75,10 +75,10 @@ const categories = [
   background: var(--bg-page);
   color: var(--text-primary);
 
-  /* Body font */
+
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
-/* Playfair Display for titles */
+
 .brand,
 .sectionTitle {
   font-family: "Playfair Display", serif;
@@ -93,7 +93,7 @@ const categories = [
   font-weight: 700;
 }
 
-/* Full-width header */
+
 .header {
   background: var(--bg-header);
   padding: 32px 0;
@@ -107,7 +107,7 @@ const categories = [
   margin: 0;
 }
 
-/* Content container: centered on desktop, full-width on mobile */
+
 .content {
   padding: 20px;
   max-width: 1100px;
@@ -138,7 +138,7 @@ const categories = [
   color: var(--text-primary);
 }
 
-/* Responsive grid: 3 cols on mobile, more on desktop */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -201,7 +201,6 @@ const categories = [
   transition: background 120ms ease, color 120ms ease;
 }
 
-/* Optional hover polish (desktop) */
 .cat:hover .iconBox {
   outline: 2px solid var(--accent);
 }
