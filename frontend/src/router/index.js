@@ -1,11 +1,11 @@
 import {createRouter, createWebHistory} from 'vue-router'
-import OrgSearch from '../views/OrgSearch.vue'
+import HomeView from '../views/HomeView.vue'
 import ResultsPage from '../views/ResultsPage.vue'
 
 const routes = [
     {
         path: '/',
-        component: OrgSearch
+        component: HomeView
     },
     {
         path: '/results/:type/:query',
