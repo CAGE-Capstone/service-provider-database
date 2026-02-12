@@ -36,14 +36,28 @@ function scrollToCategories() {
   }
 }
 
-// const categories = [
-//   { key: "Housing", img: housingIcon },
-//   { key: "Recovery", icon: "🩹" },
-//   { key: "Health", icon: "❤️" },
-//   { key: "Education", icon: "🎓" },
-//   { key: "Food", icon: "🍽️" },
-//   { key: "Employment", icon: "🧑‍💼" },
-// ];
+function formatCategory(name) {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function categoryIcon(name) {
+  const n = (name || "").toLowerCase();
+
+  if (n.includes("housing")) return "🏠";
+  if (n.includes("recovery")) return "🩹";
+  if (n.includes("mental")) return "🧠";       
+  if (n.includes("health")) return "🩹";        
+  if (n.includes("education")) return "🎓";
+  if (n.includes("food")) return "🍽️";
+  if (n.includes("employment") || n.includes("job")) return "🧑‍💼";
+  if (n.includes("art") || n.includes("culture")) return "🎨";       
+  if (n.includes("environment") || n.includes("animal")) return "🐾"; 
+
+  return "⭐️";
+}
 
 const categories = ref([]);
 const searchQuery = ref('');
@@ -155,24 +169,17 @@ onMounted(async () => {
           </div>
 
           <div class="searchRow">
-            <!-- <div class="searchBar" role="search" aria-label="Search providers">
-              <span class="searchText">Search</span>
+            <div class="searchPill" role="search" aria-label="Search providers">
+              <input
+                class="searchInput"
+                v-model="searchQuery"
+                @keyup.enter="handleKeywordSearch(searchQuery)"
+                placeholder="Search"
+              />
               <span class="searchIcon" aria-hidden="true">🔍</span>
-            </div> -->
-            <input
-              class="searchBar"
-              role="search"
-              aria-label="Search providers"
-              v-model="searchQuery"
-              @keyup.enter="handleKeywordSearch(searchQuery)"
-              placeholder="Search"
-            />
+            </div>
 
-            <button 
-              class="primaryBtn" 
-              type="button" 
-              @click="handleKeywordSearch(searchQuery)"
-            >
+            <button class="primaryBtn" type="button" @click="handleKeywordSearch(searchQuery)">
               Search
             </button>
           </div>
@@ -202,17 +209,20 @@ onMounted(async () => {
               <div class="label">{{ c.key }}</div>
             </button>
           </div> -->
-          <div class="grid">
-            <button
-              v-for="c in categories"
-              :key="c"
-              class="catCard"
-              type="button"
-              @click="handleCategoryClick(c)"
-            >
-              <div class="label">{{ c }}</div>
-            </button>
-          </div>
+            <div class="grid">
+              <button
+                v-for="c in categories"
+                :key="c"
+                class="catCard"
+                type="button"
+                @click="handleCategoryClick(c)"
+              >
+                <div class="iconBox">
+                  <span class="emoji" aria-hidden="true">{{ categoryIcon(c) }}</span>
+                </div>
+                <div class="label">{{ formatCategory(c) }}</div>
+              </button>
+            </div>
         </div>
       </section>
 
@@ -355,15 +365,15 @@ onMounted(async () => {
 
 /* ===== Layout helpers ===== */
 .container {
-  max-width: 1100px;
+  max-width: 1280px;     
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 56px;     
 }
 
 /* ===== Hero (Wix-style) ===== */
 .hero {
   background: var(--bg-hero);
-  padding: 64px 0;
+  padding: 72px 0 84px;  /* screenshot feel */
 }
 
 .heroInner {
@@ -515,15 +525,17 @@ onMounted(async () => {
 /* ===== Categories grid ===== */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  justify-content: center;
 }
 
-@media (min-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
+.catCard {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
 }
+
 
 .catCard {
   background: transparent;
@@ -561,11 +573,13 @@ onMounted(async () => {
 }
 
 .label {
-  margin-top: 10px;
+  margin-top: 12px;
   font-family: "Cormorant Garamond", serif;
-  font-weight: 600;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 18px;
   color: #2f3e36;
+  text-align: center;
+  white-space: nowrap;     
 }
 
 /* ===== Cards / two column section ===== */
@@ -617,13 +631,6 @@ onMounted(async () => {
   width: 100%;
   font-size: 14px;
   color: var(--text-primary);
-}
-
-.locationBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
 }
 
 .map {
@@ -693,4 +700,60 @@ onMounted(async () => {
   margin: 0;
   color: var(--text-secondary);
 }
+
+.footerText {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ===== NEW SEARCH BAR STYLES (ADD THIS BLOCK) ===== */
+.searchPill {
+  flex: 1;
+  min-width: 260px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.searchIcon {
+  margin-left: 10px;
+  opacity: 0.7;
+}
+
+/* ===== LOCATION BUTTON FIX ===== */
+.locationBtn {
+  padding: 12px 22px;
+  border-radius: 999px;
+}
+
+.blockSearch {
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.locationInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 12px 14px;
+}
+
 </style>
