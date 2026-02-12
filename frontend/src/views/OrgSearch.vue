@@ -1,5 +1,7 @@
 <template>
 
+    <!-- DUMMY PAGE - hi Ella, do not worry about this page, just used it to get the search functionality down ~Gabby -->
+
     <!-- search bar -->
     <div class = 'search-bar'>
         <input

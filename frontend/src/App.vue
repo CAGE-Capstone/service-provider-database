@@ -6,5 +6,5 @@
 </template>
 
 <script setup>
-import OrgSearch from './components/OrgSearch.vue'
+import OrgSearch from './views/OrgSearch.vue'
 </script>
