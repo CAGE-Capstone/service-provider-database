@@ -155,12 +155,26 @@ onMounted(async () => {
           </div>
 
           <div class="searchRow">
-            <div class="searchBar" role="search" aria-label="Search providers">
+            <!-- <div class="searchBar" role="search" aria-label="Search providers">
               <span class="searchText">Search</span>
               <span class="searchIcon" aria-hidden="true">🔍</span>
-            </div>
+            </div> -->
+            <input
+              class="searchBar"
+              role="search"
+              aria-label="Search providers"
+              v-model="searchQuery"
+              @keyup.enter="handleKeywordSearch(searchQuery)"
+              placeholder="Search"
+            />
 
-            <button class="primaryBtn" type="button">Search</button>
+            <button 
+              class="primaryBtn" 
+              type="button" 
+              @click="handleKeywordSearch(searchQuery)"
+            >
+              Search
+            </button>
           </div>
         </div>
       </section>
