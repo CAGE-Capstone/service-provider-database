@@ -2,7 +2,7 @@
 import { useRouter } from "vue-router";
 import homepageIcon from "../assets/icons/main-image-homepage.png";
 import housingIcon from "../assets/icons/house-symbol.png";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const router = useRouter();
 
@@ -36,22 +36,44 @@ function scrollToCategories() {
   }
 }
 
-const categories = [
-  { key: "Housing", img: housingIcon },
-  { key: "Recovery", icon: "🩹" },
-  { key: "Health", icon: "❤️" },
-  { key: "Education", icon: "🎓" },
-  { key: "Food", icon: "🍽️" },
-  { key: "Employment", icon: "🧑‍💼" },
-];
+// const categories = [
+//   { key: "Housing", img: housingIcon },
+//   { key: "Recovery", icon: "🩹" },
+//   { key: "Health", icon: "❤️" },
+//   { key: "Education", icon: "🎓" },
+//   { key: "Food", icon: "🍽️" },
+//   { key: "Employment", icon: "🧑‍💼" },
+// ];
 
-function handleCategoryClick(key) {
-  if (key === "Food") {
-    router.push("/resource/bmac-food-bank"); 
-  } else {
-    // alert(`${key} page coming soon`);
-  }
+const categories = ref([]);
+const searchQuery = ref('');
+
+function handleKeywordSearch(query) {
+  if (!query) return;
+
+  router.push(`/results/keyword/${encodeURIComponent(query)}`)
 }
+
+function handleCategoryClick(cat) {
+  router.push(`/results/category/${encodeURIComponent(cat)}`)
+}
+
+onMounted(async () => {
+  try {
+    const res = await fetch('http://127.0.0.1:5000/api/categories')
+      categories.value = await res.json()
+  } catch (err) {
+      console.error('Failed to fetch categories:', err)
+  }
+})
+
+// function handleCategoryClick(key) {
+//   if (key === "Food") {
+//     router.push("/resource/bmac-food-bank"); 
+//   } else {
+//     // alert(`${key} page coming soon`);
+//   }
+// }
 </script>
 
 <template>
@@ -133,12 +155,26 @@ function handleCategoryClick(key) {
           </div>
 
           <div class="searchRow">
-            <div class="searchBar" role="search" aria-label="Search providers">
+            <!-- <div class="searchBar" role="search" aria-label="Search providers">
               <span class="searchText">Search</span>
               <span class="searchIcon" aria-hidden="true">🔍</span>
-            </div>
+            </div> -->
+            <input
+              class="searchBar"
+              role="search"
+              aria-label="Search providers"
+              v-model="searchQuery"
+              @keyup.enter="handleKeywordSearch(searchQuery)"
+              placeholder="Search"
+            />
 
-            <button class="primaryBtn" type="button">Search</button>
+            <button 
+              class="primaryBtn" 
+              type="button" 
+              @click="handleKeywordSearch(searchQuery)"
+            >
+              Search
+            </button>
           </div>
         </div>
       </section>
@@ -151,7 +187,7 @@ function handleCategoryClick(key) {
             <p class="sectionDesc">Choose a category to explore services.</p>
           </div>
 
-          <div class="grid">
+          <!-- <div class="grid">
             <button
               v-for="c in categories"
               :key="c.key"
@@ -164,6 +200,17 @@ function handleCategoryClick(key) {
                 <span v-else class="emoji" aria-hidden="true">{{ c.icon }}</span>
               </div>
               <div class="label">{{ c.key }}</div>
+            </button>
+          </div> -->
+          <div class="grid">
+            <button
+              v-for="c in categories"
+              :key="c"
+              class="catCard"
+              type="button"
+              @click="handleCategoryClick(c)"
+            >
+              <div class="label">{{ c }}</div>
             </button>
           </div>
         </div>
