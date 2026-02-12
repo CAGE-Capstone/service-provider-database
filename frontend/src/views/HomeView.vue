@@ -36,14 +36,16 @@ function scrollToCategories() {
   }
 }
 
-// const categories = [
-//   { key: "Housing", img: housingIcon },
-//   { key: "Recovery", icon: "🩹" },
-//   { key: "Health", icon: "❤️" },
-//   { key: "Education", icon: "🎓" },
-//   { key: "Food", icon: "🍽️" },
-//   { key: "Employment", icon: "🧑‍💼" },
-// ];
+function categoryIcon(name) {
+  const n = (name || "").toLowerCase();
+  if (n.includes("housing")) return "🏠";
+  if (n.includes("recovery")) return "🩹";
+  if (n.includes("health")) return "❤️";
+  if (n.includes("education")) return "🎓";
+  if (n.includes("food")) return "🍽️";
+  if (n.includes("employment") || n.includes("job")) return "🧑‍💼";
+  return "⭐️";
+}
 
 const categories = ref([]);
 const searchQuery = ref('');
@@ -155,24 +157,17 @@ onMounted(async () => {
           </div>
 
           <div class="searchRow">
-            <!-- <div class="searchBar" role="search" aria-label="Search providers">
-              <span class="searchText">Search</span>
+            <div class="searchPill" role="search" aria-label="Search providers">
+              <input
+                class="searchInput"
+                v-model="searchQuery"
+                @keyup.enter="handleKeywordSearch(searchQuery)"
+                placeholder="Search"
+              />
               <span class="searchIcon" aria-hidden="true">🔍</span>
-            </div> -->
-            <input
-              class="searchBar"
-              role="search"
-              aria-label="Search providers"
-              v-model="searchQuery"
-              @keyup.enter="handleKeywordSearch(searchQuery)"
-              placeholder="Search"
-            />
+            </div>
 
-            <button 
-              class="primaryBtn" 
-              type="button" 
-              @click="handleKeywordSearch(searchQuery)"
-            >
+            <button class="primaryBtn" type="button" @click="handleKeywordSearch(searchQuery)">
               Search
             </button>
           </div>
@@ -202,17 +197,20 @@ onMounted(async () => {
               <div class="label">{{ c.key }}</div>
             </button>
           </div> -->
-          <div class="grid">
-            <button
-              v-for="c in categories"
-              :key="c"
-              class="catCard"
-              type="button"
-              @click="handleCategoryClick(c)"
-            >
-              <div class="label">{{ c }}</div>
-            </button>
-          </div>
+            <div class="grid">
+              <button
+                v-for="c in categories"
+                :key="c"
+                class="catCard"
+                type="button"
+                @click="handleCategoryClick(c)"
+              >
+                <div class="iconBox">
+                  <span class="emoji" aria-hidden="true">{{ categoryIcon(c) }}</span>
+                </div>
+                <div class="label">{{ c }}</div>
+              </button>
+            </div>
         </div>
       </section>
 
@@ -619,13 +617,6 @@ onMounted(async () => {
   color: var(--text-primary);
 }
 
-.locationBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
 .map {
   margin-top: 12px;
   height: 240px;
@@ -693,4 +684,60 @@ onMounted(async () => {
   margin: 0;
   color: var(--text-secondary);
 }
+
+.footerText {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ===== NEW SEARCH BAR STYLES (ADD THIS BLOCK) ===== */
+.searchPill {
+  flex: 1;
+  min-width: 260px;
+  background: var(--bg-card);
+  border-radius: 999px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.searchInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.searchIcon {
+  margin-left: 10px;
+  opacity: 0.7;
+}
+
+/* ===== LOCATION BUTTON FIX ===== */
+.locationBtn {
+  padding: 12px 22px;
+  border-radius: 999px;
+}
+
+.blockSearch {
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.locationInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 12px 14px;
+}
+
 </style>
