@@ -19,8 +19,13 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes
-})
+  history: createWebHistory(),
+  routes: [
+    { path: "/", name: "home", component: HomeView },
 
-export default router
+    // ✅ resource detail page
+    { path: "/resource/:id", name: "resource", component: ResourceDesciption },
+  ],
+});
+
+export default router;
