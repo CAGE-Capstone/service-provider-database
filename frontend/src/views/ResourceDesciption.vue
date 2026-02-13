@@ -24,7 +24,7 @@ const scrollToSearch = async () => {
  */
 const MOCK_RESOURCES = [
   {
-    id: "bmac-food-bank",
+    id: "BMAC Food Bank",
     name: "BMAC Food Bank",
     phone: "(509) 529-4980",
     email: "No email provided",
