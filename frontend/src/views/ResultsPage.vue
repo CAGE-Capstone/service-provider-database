@@ -10,6 +10,7 @@
         <div v-else class = 'results'>
             <button
                 v-for='res in results'
+                @click="handleResourceClick(res.name)"
             >
                 {{res.name}}
             </button>
@@ -21,13 +22,18 @@
 <script setup>
 
     import {ref, onMounted, watch} from 'vue'
-    import {useRoute} from 'vue-router'
+    import {useRoute, useRouter} from 'vue-router'
 
     const route = useRoute()
+    const router = useRouter()
 
     const results = ref([])
     const loading = ref(true)
     const query = ref('')
+
+    function handleResourceClick (name) {
+        router.push(`/resource/${encodeURIComponent(name)}`)
+    }
 
     async function getResults() {
         const type = route.params.type
