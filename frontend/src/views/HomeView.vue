@@ -129,24 +129,6 @@ onMounted(async () => {
             Find services faster — browse categories, filter results, and view key contact details.
           </p>
 
-          <div class="heroActions">
-            <button
-              class="primaryBtn"
-              type="button"
-              @click="scrollToSearch"
-            >
-  Start Searching
-</button>
-
-            <button
-              class="primaryBtn"
-              type="button"
-              @click="scrollToCategories"
-            >
-  Browse Categories
-</button>
-
-          </div>
         </div>
 
         <div class="heroMedia">
@@ -290,7 +272,7 @@ onMounted(async () => {
 
 .topbar {
   background: var(--bg-hero);
-  padding: 14px 24px;
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -312,7 +294,7 @@ onMounted(async () => {
 
 .navLink {
   text-decoration: none;
-  font-family: "Cormorant Garamond", serif;  /* MATCH TITLE */
+  font-family: "Cormorant Garamond", serif; 
   font-size: 18px;
   font-weight: 600;
   color: #2f3e36;
@@ -324,11 +306,16 @@ onMounted(async () => {
 }
 
 .languageSelect {
-  padding: 8px 14px;
+  font-family: "Cormorant Garamond", serif; 
+  font-size: 15px;      
+  font-weight: 600;     
+  letter-spacing: 0.4px;
+
+  padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid #ddd;
   background: white;
-  font-size: 14px;
+  color: #2f3e36;
   cursor: pointer;
 }
 
@@ -359,7 +346,7 @@ onMounted(async () => {
   font-weight: 600;
   line-height: 1.05;
   letter-spacing: 0.5px;
-  color: #2f3e36; /* dark muted green like screenshot */
+  color: #2f3e36;
 }
 
 
@@ -370,10 +357,10 @@ onMounted(async () => {
   padding: 0 56px;     
 }
 
-/* ===== Hero (Wix-style) ===== */
+/* ===== Hero ===== */
 .hero {
   background: var(--bg-hero);
-  padding: 72px 0 84px;  /* screenshot feel */
+  padding: 4px 0 8px; 
 }
 
 .heroInner {
@@ -384,7 +371,7 @@ onMounted(async () => {
 }
 
 .eyebrow {
-  margin: 0 0 10px;
+  margin: 0 0 4px;
   font-weight: 700;
   color: var(--text-secondary);
   letter-spacing: 0.08em;
@@ -394,7 +381,7 @@ onMounted(async () => {
 
 .brand {
   margin: 0;
-  font-size: 44px;
+  font-size: 40px;
   line-height: 1.05;
   font-weight: 800;
 }
@@ -417,6 +404,8 @@ onMounted(async () => {
 .heroImage {
   width: 100%;
   height: auto;
+  max-height: 180px;
+  object-fit: contain;
   border-radius: 18px;
   display: block;
 }
@@ -476,7 +465,7 @@ onMounted(async () => {
 }
 
 .section {
-  padding: 48px 0;
+  padding: 20px 0;
 }
 
 .sectionHeader {
@@ -485,14 +474,20 @@ onMounted(async () => {
 
 .sectionTitle {
   margin: 0;
+  font-family: "Cormorant Garamond", serif;
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
+  color: #2f3e36;       
 }
 
 .sectionDesc {
   margin: 8px 0 0;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+#searchSection.section {
+  padding-top: 28px;   /* pulls Search higher */
 }
 
 /* ===== Search row ===== */
