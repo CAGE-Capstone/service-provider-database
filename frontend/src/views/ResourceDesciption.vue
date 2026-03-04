@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, nextTick } from "vue";
+import { computed, ref, nextTick, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
@@ -19,29 +19,72 @@ const scrollToSearch = async () => {
   }
 };
 
-/**
- * TEMP Data
- */
-const MOCK_RESOURCES = [
-  {
-    id: "BMAC Food Bank",
-    name: "BMAC Food Bank",
-    phone: "(509) 529-4980",
-    email: "No email provided",
-    description:
-      "Provides food assistance through community pantries and distribution programs. The lead volunteer is Trevor Sandjathe.",
-    hours: ["Mon–Fri: 9am–4pm", "Sat: 10am–2pm"],
-    services: ["Food pantry", "Meal distribution", "Emergency groceries"],
-    website: "https://www.bmacww.org/programs/food",
-    address: "921 W Cherry Street, Walla Walla, WA 99362",
-    mapQuery: "921 W Cherry Street, Walla Walla, WA 99362",
-  },
-];
+const organizations = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await fetch("http://127.0.0.1:5000/api/organizations");
+    const data = await res.json();
+    organizations.value = data;
+  } catch (err) {
+    console.error("Error fetching organizations:", err);
+  }
+});
 
 const resource = computed(() => {
   const id = route.params.id;
-  return MOCK_RESOURCES.find((r) => r.id === id) || null;
+
+  if (!organizations.value.length) return null;
+
+  const found = organizations.value.find(
+    (org) => org.name === id
+  );
+
+  if (!found) return null;
+
+  const row = found.data;
+
+  return {
+    id: found.id,
+    name: found.name,
+    category: found.category,
+    description: row[1] || "",
+    phone: row[2] || "",
+    contact: row[3] || "",
+    email: row[4] || "",
+    address: row[5] || "",
+    website: row[6] || "",
+    services: row[7]
+      ? row[7].split(",").map((s) => s.trim())
+      : [],
+    hours: []
+  };
 });
+
+
+/**
+ * TEMP Data
+ */
+// const MOCK_RESOURCES = [
+//   {
+//     id: "BMAC Food Bank",
+//     name: "BMAC Food Bank",
+//     phone: "(509) 529-4980",
+//     email: "No email provided",
+//     description:
+//       "Provides food assistance through community pantries and distribution programs. The lead volunteer is Trevor Sandjathe.",
+//     hours: ["Mon–Fri: 9am–4pm", "Sat: 10am–2pm"],
+//     services: ["Food pantry", "Meal distribution", "Emergency groceries"],
+//     website: "https://www.bmacww.org/programs/food",
+//     address: "921 W Cherry Street, Walla Walla, WA 99362",
+//     mapQuery: "921 W Cherry Street, Walla Walla, WA 99362",
+//   },
+// ];
+
+// const resource = computed(() => {
+//   const id = route.params.id;
+//   return MOCK_RESOURCES.find((r) => r.id === id) || null;
+// });
 
 const mapUrl = computed(() => {
   if (!resource.value) return "";
