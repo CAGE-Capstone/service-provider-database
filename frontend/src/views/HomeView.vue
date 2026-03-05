@@ -123,8 +123,8 @@ onMounted(async () => {
         <div class="container heroInner">
           <div class="heroText">
 
-          <p class="eyebrow">Community Resource Directory</p>
-          <h1 class="brand">Service Provider Database</h1>
+          <!-- <p class="eyebrow">Community Resource Directory</p> -->
+          <h1 class="brand">Community Resource Directory</h1>
           <p class="subhead">
             Find services faster — browse categories, filter results, and view key contact details.
           </p>
