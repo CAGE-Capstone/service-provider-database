@@ -106,8 +106,8 @@ onMounted(async () => {
           Search
         </a>
 
-        <router-link to="/organizations" class="navLink">Organizations</router-link>
-        <router-link to="/about" class="navLink">About</router-link>
+        <router-link to="/results" class="navLink">Organizations</router-link>
+        <!-- <router-link to="/about" class="navLink">About</router-link> -->
 
         <!-- LANGUAGE DROPDOWN -->
         <select v-model="language" class="languageSelect">

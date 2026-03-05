@@ -15,6 +15,10 @@ const routes = [
     {
         path: '/resource/:id',
         component: ResourceDesciption
+    },
+    {
+        path: '/results',
+        component: ResultsPage
     }
 ]
 
