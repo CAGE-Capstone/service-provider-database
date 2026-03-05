@@ -115,8 +115,8 @@ function goBack() {
 
             <a href="#" class="navLink" @click.prevent="scrollToSearch">Search</a>
 
-            <router-link to="/organizations" class="navLink">Organizations</router-link>
-            <router-link to="/about" class="navLink">About</router-link>
+            <router-link to="/results" class="navLink">Organizations</router-link>
+            <!-- <router-link to="/about" class="navLink">About</router-link> -->
 
             <select v-model="language" class="languageSelect" aria-label="Language">
             <option value="en">English</option>
