@@ -150,6 +150,27 @@ LAYOUT_CSS = """
     .detail-card { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
     .detail-item { padding: 12px 0; border-bottom: 1px solid #eee; display: flex; }
     .detail-label { width: 200px; font-weight: bold; color: #606770; text-transform: uppercase; font-size: 0.8rem; }
+
+    .translate-dropdown {
+        position: fixed;
+        top: 100px;
+        right: 15px;
+        font-size: 12px;
+        padding: 6px 8px;
+        border-radius: 6px;
+        width: 90px;
+        z-index: 9999;
+    }
+
+    /* hide google banner */
+    .goog-te-banner-frame.skiptranslate {
+        display: none !important;
+    }
+
+    body {
+        top: 0px !important;
+    }
+
 </style>
 """
 
@@ -158,7 +179,11 @@ HOME_HTML = """
 <html>
 <head><title>Walla Walla Resources</title>{{ css|safe }}</head>
 <body>
-    <div class="navbar">Resource Finder</div>
+    <select class="translate-dropdown"
+        onchange="if(this.value=='es'){translateToSpanish()}else{translateToEnglish()}">
+    <option value="en">English</option>
+    <option value="es">Español</option>
+</select>
     <div style="max-width: 700px; margin: 100px auto; text-align: center; background: white; padding: 50px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
         <h1>Community Resource Search</h1>
         <p>Find food, health, shelter, and support services in Walla Walla.</p>
@@ -173,6 +198,40 @@ HOME_HTML = """
             {% endfor %}
         </div>
     </div>
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {pageLanguage: 'en', includedLanguages: 'es', autoDisplay: false},
+    'google_translate_element'
+  );
+}
+
+function translateToSpanish() {
+  document.cookie = "googtrans=/en/es;path=/";
+  location.reload();
+}
+
+function translateToEnglish() {
+  document.cookie = "googtrans=/en/en;path=/";
+  location.reload();
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script>
+setInterval(function(){
+    var banner = document.querySelector(".goog-te-banner-frame");
+    if (banner) {
+        banner.remove();
+        document.body.style.top = "0px";
+    }
+}, 300);
+</script>
+
 </body>
 </html>
 """
@@ -182,7 +241,11 @@ RESULTS_HTML = """
 <html>
 <head><title>Results</title>{{ css|safe }}</head>
 <body>
-    <div class="navbar"><a href="/">← Back to Home</a></div>
+    <select class="translate-dropdown"
+        onchange="if(this.value=='es'){translateToSpanish()}else{translateToEnglish()}">
+    <option value="en">EN</option>
+    <option value="es">ES</option>
+</select>
     <div class="container">
         <div class="sidebar">
             <form action="/results" method="get">
@@ -236,6 +299,29 @@ RESULTS_HTML = """
             </div>
         </div>
     </div>
+<!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {pageLanguage: 'en', includedLanguages: 'es', autoDisplay: false},
+    'google_translate_element'
+  );
+}
+
+function translateToSpanish() {
+  document.cookie = "googtrans=/en/es;path=/";
+  location.reload();
+}
+
+function translateToEnglish() {
+  document.cookie = "googtrans=/en/en;path=/";
+  location.reload();
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
 """
@@ -287,7 +373,11 @@ def resource_detail(row_index):
         <html>
         <head><title>{{ name }}</title>{{ css|safe }}</head>
         <body>
-            <div class="navbar"><a href="javascript:history.back()">← Back to Results</a></div>
+            <select class="translate-dropdown"
+                    onchange="if(this.value=='es'){translateToSpanish()}else{translateToEnglish()}">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+            </select>
             <div class="detail-card">
                 <h1 style="color:#007bff; margin-top:0;">{{ name }}</h1>
                 <p style="background: #e7f3ff; display: inline-block; padding: 5px 15px; border-radius: 20px; color: #007bff; font-weight: bold;">{{ category }}</p>
@@ -300,6 +390,29 @@ def resource_detail(row_index):
                     {% endfor %}
                 </div>
             </div>
+        <!-- Google Translate Widget -->
+<div id="google_translate_element" style="display:none;"></div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {pageLanguage: 'en', includedLanguages: 'es', autoDisplay: false},
+    'google_translate_element'
+  );
+}
+
+function translateToSpanish() {
+  document.cookie = "googtrans=/en/es;path=/";
+  location.reload();
+}
+
+function translateToEnglish() {
+  document.cookie = "googtrans=/en/en;path=/";
+  location.reload();
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
         </body>
         </html>
     """, name=res['name'], category=res['category'], details=detail_items, css=LAYOUT_CSS)
