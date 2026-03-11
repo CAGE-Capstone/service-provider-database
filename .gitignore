@@ -6,3 +6,6 @@ venv/
 # Ignore Python cache files
 __pycache__/
 *.pyc
+
+# Ignore credentials.json
+credentials.json
