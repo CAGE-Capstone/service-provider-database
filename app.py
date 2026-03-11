@@ -5,7 +5,13 @@ from flask import Flask, render_template_string, request
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+# necessary for frontend to access backend
+from flask_cors import CORS
+
 app = Flask(__name__)
+
+# allow access
+CORS(app)
 
 # --- Constants & Config ---
 NAME_COL_INDEX = 0
