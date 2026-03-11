@@ -6,6 +6,8 @@ const router = useRouter();
 const route = useRoute();
 
 const language = ref("en");
+const translateToSpanish = window.translateToSpanish
+const translateToEnglish = window.translateToEnglish
 
 const scrollToSearch = async () => {
   if (router.currentRoute.value.path !== "/") {
@@ -118,7 +120,7 @@ function goBack() {
             <router-link to="/results" class="navLink">Organizations</router-link>
             <!-- <router-link to="/about" class="navLink">About</router-link> -->
 
-            <select v-model="language" class="languageSelect" aria-label="Language">
+            <select class="languageSelect" @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()">
             <option value="en">English</option>
             <option value="es">Español</option>
             </select>

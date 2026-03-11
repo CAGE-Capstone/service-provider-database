@@ -1,159 +1,3 @@
-<template>
-  <div class="page">
-    <header class="topbar">
-      <button class="iconBtn" type="button" @click="goBack" aria-label="Go back">←</button>
-      <h1 class="title">Results</h1>
-      <div class="spacer" aria-hidden="true"></div>
-    </header>
-
-    <main class="main">
-      <!-- Search within results -->
-      <div class="searchPill" role="search" aria-label="Search results">
-        <input
-          class="searchInput"
-          v-model="searchText"
-          placeholder="Search results"
-        />
-        <span class="searchIcon" aria-hidden="true">🔍</span>
-      </div>
-
-      <!-- Sort + Filter row -->
-
-      <div class="controlsRow">
-            <div class="sortWrap">
-            <button
-                class="chipBtn"
-                type="button"
-                @click="sortMenuOpen = !sortMenuOpen"
-                aria-haspopup="menu"
-                :aria-expanded="sortMenuOpen"
-            >
-                Sort: <span class="chipValue">{{ sortLabel }}</span> ▾
-            </button>
-
-            <div v-if="sortMenuOpen" class="menu" role="menu" @click.stop>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('relevance')">
-                Relevance
-                </button>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('az')">
-                Alphabetical (A–Z)
-                </button>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('distance')">
-                Distance
-                </button>
-            </div>
-            </div>
-
-        <div class="filterWrap">
-        <button
-            class="chipBtn"
-            type="button"
-            @click="filterMenuOpen = !filterMenuOpen"
-            aria-haspopup="menu"
-            :aria-expanded="filterMenuOpen"
-        >
-            Filter: <span class="chipValue">{{ activeFilterLabel }}</span> ▾
-        </button>
-
-        <div v-if="filterMenuOpen" class="menu" role="menu" @click.stop>
-        <div class="menuSectionTitle">Category</div>
-
-        <button
-            v-for="c in categoryOptions"
-            :key="`cat-${c}`"
-            class="menuItem"
-            :class="{ selected: selectedCategories.includes(c) }"
-            type="button"
-            @click="toggleCategory(c)"
-        >
-            <span>{{ c }}</span>
-            <span class="check" v-if="selectedCategories.includes(c)">✓</span>
-        </button>
-
-        <div class="menuDivider"></div>
-
-        <div class="menuSectionTitle">Demographic</div>
-
-        <button
-            v-for="d in demographicOptions"
-            :key="`demo-${d}`"
-            class="menuItem"
-            :class="{ selected: selectedDemographics.includes(d) }"
-            type="button"
-            @click="toggleDemographic(d)"
-        >
-            <span>{{ d }}</span>
-            <span class="check" v-if="selectedDemographics.includes(d)">✓</span>
-        </button>
-
-        <div class="menuFooter">
-            <button
-            class="menuAction"
-            type="button"
-            @click="selectedCategories = []; selectedDemographics = []"
-            >
-            Clear
-            </button>
-
-            <button class="menuAction primary" type="button" @click="filterMenuOpen = false">
-            Done
-            </button>
-        </div>
-        </div>
-        </div>
-      </div>
-
-      <!-- Sub-categories (UI only, optional data effect) -->
-      <section class="subcats">
-        <h2 class="subcatsLabel">Sub-Categories</h2>
-        <div class="subcatsRow">
-          <button
-            v-for="s in subcategories"
-            :key="s"
-            class="subcatChip"
-            :class="{ active: selectedSubcategory === s }"
-            type="button"
-            @click="selectedSubcategory = s"
-          >
-            {{ s }}
-          </button>
-        </div>
-      </section>
-
-      <!-- Results -->
-      <section class="resultsSection">
-        <div class="resultsHeader">
-          <h2 class="resultsH2">{{ headerText }}</h2>
-          <p class="count" v-if="!loading && !errorMsg">{{ filteredResults.length }} found</p>
-        </div>
-
-        <p class="state" v-if="loading">Loading…</p>
-        <p class="state error" v-else-if="errorMsg">{{ errorMsg }}</p>
-        <p class="state" v-else-if="filteredResults.length === 0">No results. Try another search.</p>
-
-        <div class="list" v-else>
-          <article
-            v-for="org in filteredResults"
-            :key="org.name"
-            class="card"
-            role="button"
-            tabindex="0"
-            @click="openResource(org.name)"
-            @keyup.enter="openResource(org.name)"
-          >
-            <div class="cardTop">
-              <h3 class="cardTitle">{{ org.name }}</h3>
-              <span class="chev" aria-hidden="true">›</span>
-            </div>
-
-            <p class="meta" v-if="org.category">Category: {{ org.category }}</p>
-          </article>
-        </div>
-      </section>
-    </main>
-  </div>
-</template>
-
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -163,6 +7,10 @@ const allOrgs = ref([]);
 const filterMenuOpen = ref(false);
 const selectedCategories = ref([]);     
 const selectedDemographics = ref([]);   
+
+const language = ref("en");
+const translateToSpanish = window.translateToSpanish
+const translateToEnglish = window.translateToEnglish
 
 const categoryOptions = computed(() => {
   const set = new Set(allOrgs.value.map(o => String(o.category || "").trim()).filter(Boolean));
@@ -421,6 +269,162 @@ const filteredResults = computed(() => {
 
 
 </script>
+
+<template>
+  <div class="page">
+    <header class="topbar">
+      <button class="iconBtn" type="button" @click="goBack" aria-label="Go back">←</button>
+      <h1 class="title">Results</h1>
+      <div class="spacer" aria-hidden="true"></div>
+    </header>
+
+    <main class="main">
+      <!-- Search within results -->
+      <div class="searchPill" role="search" aria-label="Search results">
+        <input
+          class="searchInput"
+          v-model="searchText"
+          placeholder="Search results"
+        />
+        <span class="searchIcon" aria-hidden="true">🔍</span>
+      </div>
+
+      <!-- Sort + Filter row -->
+
+      <div class="controlsRow">
+            <div class="sortWrap">
+            <button
+                class="chipBtn"
+                type="button"
+                @click="sortMenuOpen = !sortMenuOpen"
+                aria-haspopup="menu"
+                :aria-expanded="sortMenuOpen"
+            >
+                Sort: <span class="chipValue">{{ sortLabel }}</span> ▾
+            </button>
+
+            <div v-if="sortMenuOpen" class="menu" role="menu" @click.stop>
+                <button class="menuItem" type="button" role="menuitem" @click="setSort('relevance')">
+                Relevance
+                </button>
+                <button class="menuItem" type="button" role="menuitem" @click="setSort('az')">
+                Alphabetical (A–Z)
+                </button>
+                <button class="menuItem" type="button" role="menuitem" @click="setSort('distance')">
+                Distance
+                </button>
+            </div>
+            </div>
+
+        <div class="filterWrap">
+        <button
+            class="chipBtn"
+            type="button"
+            @click="filterMenuOpen = !filterMenuOpen"
+            aria-haspopup="menu"
+            :aria-expanded="filterMenuOpen"
+        >
+            Filter: <span class="chipValue">{{ activeFilterLabel }}</span> ▾
+        </button>
+
+        <div v-if="filterMenuOpen" class="menu" role="menu" @click.stop>
+        <div class="menuSectionTitle">Category</div>
+
+        <button
+            v-for="c in categoryOptions"
+            :key="`cat-${c}`"
+            class="menuItem"
+            :class="{ selected: selectedCategories.includes(c) }"
+            type="button"
+            @click="toggleCategory(c)"
+        >
+            <span>{{ c }}</span>
+            <span class="check" v-if="selectedCategories.includes(c)">✓</span>
+        </button>
+
+        <div class="menuDivider"></div>
+
+        <div class="menuSectionTitle">Demographic</div>
+
+        <button
+            v-for="d in demographicOptions"
+            :key="`demo-${d}`"
+            class="menuItem"
+            :class="{ selected: selectedDemographics.includes(d) }"
+            type="button"
+            @click="toggleDemographic(d)"
+        >
+            <span>{{ d }}</span>
+            <span class="check" v-if="selectedDemographics.includes(d)">✓</span>
+        </button>
+
+        <div class="menuFooter">
+            <button
+            class="menuAction"
+            type="button"
+            @click="selectedCategories = []; selectedDemographics = []"
+            >
+            Clear
+            </button>
+
+            <button class="menuAction primary" type="button" @click="filterMenuOpen = false">
+            Done
+            </button>
+        </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Sub-categories (UI only, optional data effect) -->
+      <section class="subcats">
+        <h2 class="subcatsLabel">Sub-Categories</h2>
+        <div class="subcatsRow">
+          <button
+            v-for="s in subcategories"
+            :key="s"
+            class="subcatChip"
+            :class="{ active: selectedSubcategory === s }"
+            type="button"
+            @click="selectedSubcategory = s"
+          >
+            {{ s }}
+          </button>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="resultsSection">
+        <div class="resultsHeader">
+          <h2 class="resultsH2">{{ headerText }}</h2>
+          <p class="count" v-if="!loading && !errorMsg">{{ filteredResults.length }} found</p>
+        </div>
+
+        <p class="state" v-if="loading">Loading…</p>
+        <p class="state error" v-else-if="errorMsg">{{ errorMsg }}</p>
+        <p class="state" v-else-if="filteredResults.length === 0">No results. Try another search.</p>
+
+        <div class="list" v-else>
+          <article
+            v-for="org in filteredResults"
+            :key="org.name"
+            class="card"
+            role="button"
+            tabindex="0"
+            @click="openResource(org.name)"
+            @keyup.enter="openResource(org.name)"
+          >
+            <div class="cardTop">
+              <h3 class="cardTitle">{{ org.name }}</h3>
+              <span class="chev" aria-hidden="true">›</span>
+            </div>
+
+            <p class="meta" v-if="org.category">Category: {{ org.category }}</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+</template>
 
 <style scoped>
 .page {
