@@ -271,5 +271,26 @@ def resource_detail(row_index):
     </html>
     """, name=res["name"], category=res["category"], details=detail_items, css=LAYOUT_CSS)
 
+# JSON API endpoints for organizations, categories, keywords, stop words
+
+from flask import jsonify
+
+@app.route('/api/organizations')
+def api_organizations():
+    return jsonify([
+        {
+            "id": r["index"],
+            "name": r["name"],
+            "category": r["category"],
+            "data": r["full_row"]
+        }
+        for r in ALL_RESOURCES
+    ])
+
+
+@app.route('/api/categories')
+def api_categories():
+    return jsonify(CATEGORIES)
+
 if __name__ == "__main__":
     app.run(debug=True)
