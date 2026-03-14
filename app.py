@@ -62,7 +62,7 @@ DEMOGRAPHIC_MAPS = {
     }
 }
 
-# --- Global Data ---
+# --- Global Data Storage ---
 ALL_RESOURCES = []
 HEADERS = []
 CATEGORIES = []
