@@ -278,7 +278,8 @@ async function getResults() {
   loading.value = true;
   errorMsg.value = "";
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/organizations");
+    // ✅ same endpoint your old page used
+    const res = await fetch("https://service-provider-database-lb3m.onrender.com/api/organizations");
     if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
     const data = await res.json();
