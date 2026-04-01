@@ -25,7 +25,7 @@ const organizations = ref([])
 
 onMounted(async () => {
   try {
-    const res = await fetch("http://127.0.0.1:5000/api/organizations");
+    const res = await fetch("https://service-provider-database-lb3m.onrender.com/api/organizations");
     const data = await res.json();
     organizations.value = data;
   } catch (err) {
