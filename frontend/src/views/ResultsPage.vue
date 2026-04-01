@@ -4,89 +4,6 @@ import { useRoute, useRouter } from "vue-router";
 
 const allOrgs = ref([]);
 
-const UI_CATEGORIES = [
-  "Food",
-  "Housing",
-  "Health",
-  "Education & Work",
-  "Legal & Financial",
-  "Transportation",
-  "Family Services",
-  "Community Programs"
-];
-
-function mapToUICategory(raw) {
-  const c = String(raw || "").toUpperCase();
-
-  // FOOD
-  if (c.includes("FOOD")) return "Food";
-
-  // HOUSING
-  if (
-    c.includes("HOUSING") ||
-    c.includes("SHELTER") ||
-    c.includes("HOMELESS") ||
-    c.includes("RENT") ||
-    c.includes("UTILITY")
-  ) {
-    return "Housing";
-  }
-
-  // HEALTH
-  if (c.includes("HEALTH") || c.includes("MENTAL")) {
-    return "Health";
-  }
-
-  // EDUCATION + WORK
-  if (
-    c.includes("EDUCATION") ||
-    c.includes("EMPLOYMENT")
-  ) {
-    return "Education & Work";
-  }
-
-  // LEGAL + FINANCIAL
-  if (
-    c.includes("LEGAL") ||
-    c.includes("LAW") ||
-    c.includes("FINANCE")
-  ) {
-    return "Legal & Financial";
-  }
-
-  // TRANSPORTATION
-  if (c.includes("TRANSPORT")) {
-    return "Transportation";
-  }
-
-  // FAMILY SERVICES
-  if (
-    c.includes("PARENT") ||
-    c.includes("CHILD") ||
-    c.includes("YOUTH") ||
-    c.includes("AGING") ||
-    c.includes("SENIOR") ||
-    c.includes("DISABILITY")
-  ) {
-    return "Family Services";
-  }
-
-  // COMMUNITY PROGRAMS
-  if (
-    c.includes("RELIGIOUS") ||
-    c.includes("ART") ||
-    c.includes("CULTURE") ||
-    c.includes("HUMANITIES") ||
-    c.includes("ENVIRONMENT") ||
-    c.includes("ANIMAL") ||
-    c.includes("COMMUNITY")
-  ) {
-    return "Community Programs";
-  }
-
-  return "Community Programs";
-}
-
 const filterMenuOpen = ref(false);
 const selectedCategories = ref([]);     
 const selectedDemographics = ref([]);   
@@ -95,7 +12,10 @@ const language = ref("en");
 const translateToSpanish = window.translateToSpanish
 const translateToEnglish = window.translateToEnglish
 
-const categoryOptions = ["All", ...UI_CATEGORIES];
+const categoryOptions = computed(() => {
+  const set = new Set(allOrgs.value.map(o => String(o.category || "").trim()).filter(Boolean));
+  return ["All", ...Array.from(set).sort((a,b)=>a.localeCompare(b))];
+});
 
 const demographicOptions = ref([
   "All",
@@ -138,11 +58,9 @@ const activeFilterLabel = computed(() => {
 const route = useRoute();
 const router = useRouter();
 
-const type = computed(() => String(route.params.type || ""));
-const query = computed(() => decodeURIComponent(String(route.params.query || "")));
-
 const loading = ref(true);
 const errorMsg = ref("");
+const results = ref([]);
 
 const searchText = ref("");
 const sortBy = ref("relevance"); 
@@ -176,8 +94,8 @@ onBeforeUnmount(() => {
 });
 
 const selectedSubcategory = ref("All");
-
 function getOrgSubcats(org) {
+  // adjust these keys to match your backend if needed
   const raw =
     org.subcategories ??
     org.subcategory ??
@@ -196,20 +114,26 @@ function getOrgSubcats(org) {
 }
 
 const subcategories = computed(() => {
-  let list = allOrgs.value;
+  // build subcats from the list AFTER search/category/demographic filters
+  let list = results.value;
 
-  // use selected filter category first, otherwise route category/search
+  watch(subcategories, () => {
+  if (!subcategories.value.includes(selectedSubcategory.value)) {
+    selectedSubcategory.value = "All";
+  }
+});
+
+  // search-within-results
+  const q = searchText.value.trim().toLowerCase();
+  if (q) {
+    list = list.filter(o => String(o.name || "").toLowerCase().includes(q));
+  }
+
+  // category filter
   if (selectedCategories.value.length) {
-    const picked = selectedCategories.value[0];
-    list = list.filter(o => mapToUICategory(o.category) === picked);
-  } else {
-    if (type.value === "category") {
-      list = list.filter(o => mapToUICategory(o.category) === query.value);
-    } else if (query.value) {
-      list = list.filter(o =>
-        String(o.name || "").toUpperCase().includes(query.value.toUpperCase())
-      );
-    }
+    list = list.filter(o =>
+      selectedCategories.value.includes(String(o.category || "").trim())
+    );
   }
 
   // demographic filter
@@ -221,12 +145,6 @@ const subcategories = computed(() => {
     });
   }
 
-  // search within results
-  const q = searchText.value.trim().toLowerCase();
-  if (q) {
-    list = list.filter(o => String(o.name || "").toLowerCase().includes(q));
-  }
-
   const set = new Set();
   for (const org of list) {
     for (const s of getOrgSubcats(org)) set.add(s);
@@ -235,39 +153,26 @@ const subcategories = computed(() => {
   return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
 });
 
-watch(subcategories, () => {
-  if (!subcategories.value.includes(selectedSubcategory.value)) {
-    selectedSubcategory.value = "All";
-  }
-});
+const type = computed(() => String(route.params.type || ""));
+const query = computed(() => decodeURIComponent(String(route.params.query || "")));
 
 const headerText = computed(() => {
-  const activeCat = selectedCategories.value.length
-    ? selectedCategories.value[0]
-    : (type.value === "category" ? query.value : null);
-
   const parts = [];
 
-  if (activeCat) parts.push(activeCat);
+  // base route context
+  if (type.value === "category" && query.value) parts.push(query.value);
   else if (query.value) parts.push(`"${query.value}"`);
 
-  if (selectedDemographics.value.length) {
-    parts.push(`Demographic: ${selectedDemographics.value.join(", ")}`);
-  }
-
-  if (selectedSubcategory.value !== "All") {
-    parts.push(`Sub-Category: ${selectedSubcategory.value}`);
-  }
+  // active filters
+  if (selectedCategories.value.length) parts.push(`Category: ${selectedCategories.value.join(", ")}`);
+  if (selectedDemographics.value.length) parts.push(`Demographic: ${selectedDemographics.value.join(", ")}`);
+  if (selectedSubcategory.value !== "All") parts.push(`Sub-Category: ${selectedSubcategory.value}`);
 
   return parts.length ? `Results for ${parts.join(" • ")}` : "Results";
 });
 
 function goBack() {
   router.back();
-}
-
-function scrollToSearchTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function openResource(name) {
@@ -279,19 +184,35 @@ async function getResults() {
   errorMsg.value = "";
   try {
     // ✅ same endpoint your old page used
+<<<<<<< HEAD
     const res = await fetch("https://service-provider-database-lb3m.onrender.com/api/organizations");
+=======
+    const res = await fetch("http://127.0.0.1:5000/api/organizations");
+>>>>>>> parent of 795ae04 (Merge pull request #70 from CAGE-Capstone/Ella's-Extravagant-Branch)
     if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
     const data = await res.json();
     allOrgs.value = data;
+    if (!Array.isArray(data)) {
+      results.value = [];
+      return;
+    }
 
-    console.log("RAW CATEGORIES:", [...new Set(data.map(o => o.category))]);
+    // apply the exact same filtering logic you had
+    const q = query.value;
 
+    if (type.value === "category") {
+      results.value = data.filter((org) => String(org.category || "").toUpperCase() === q.toUpperCase());
+    } else {
+      results.value = data.filter((org) => String(org.name || "").toUpperCase().includes(q.toUpperCase()));
+    }
+
+    // initialize local search field to the route query (nice UX)
     searchText.value = "";
   } catch (err) {
     console.error(err);
     errorMsg.value = err?.message || "Error fetching results";
-    allOrgs.value = [];
+    results.value = [];
   } finally {
     loading.value = false;
   }
@@ -304,21 +225,26 @@ onMounted(getResults);
 const filteredResults = computed(() => {
   let list = allOrgs.value;
 
-  // selected filter category overrides route category
+  // 1) CATEGORY SOURCE:
+  // If user picked a category in the filter dropdown, use that.
+  // Otherwise fall back to the route category/search.
   if (selectedCategories.value.length) {
     const picked = selectedCategories.value[0];
-    list = list.filter(o => mapToUICategory(o.category) === picked);
+    list = list.filter(o => String(o.category || "").trim().toUpperCase() === picked.toUpperCase());
   } else {
+    // fall back to route behavior
     if (type.value === "category") {
-      list = list.filter(o => mapToUICategory(o.category) === query.value);
-    } else if (query.value) {
-      list = list.filter(o =>
-        String(o.name || "").toUpperCase().includes(query.value.toUpperCase())
-      );
+      const q = query.value;
+      list = list.filter(o => String(o.category || "").trim().toUpperCase() === q.toUpperCase());
+    } else {
+      const q = query.value;
+      if (q) {
+        list = list.filter(o => String(o.name || "").toUpperCase().includes(q.toUpperCase()));
+      }
     }
   }
 
-  // demographic filter
+  // 2) demographic filter
   if (selectedDemographics.value.length) {
     list = list.filter(o => {
       const d = (o.demographic || o.demographics || o.population || "");
@@ -327,22 +253,14 @@ const filteredResults = computed(() => {
     });
   }
 
-  // search within results
-  const q = searchText.value.trim().toLowerCase();
-  if (q) {
-    list = list.filter(o => String(o.name || "").toLowerCase().includes(q));
-  }
+  // 3) search-within-results
+  const q2 = searchText.value.trim().toLowerCase();
+  if (q2) list = list.filter(o => String(o.name || "").toLowerCase().includes(q2));
 
-  // subcategory chip filter
-  if (selectedSubcategory.value !== "All") {
-    list = list.filter(org => getOrgSubcats(org).includes(selectedSubcategory.value));
-  }
-
-  // sort
+  // 4) sort
   if (sortBy.value === "az") {
     list = [...list].sort((a, b) =>
-      String(a?.name ?? "").trim().toLowerCase()
-        .localeCompare(String(b?.name ?? "").trim().toLowerCase())
+      String(a?.name ?? "").trim().toLowerCase().localeCompare(String(b?.name ?? "").trim().toLowerCase())
     );
   } else if (sortBy.value === "distance") {
     if (list.some(o => o.distance != null)) {
@@ -359,27 +277,9 @@ const filteredResults = computed(() => {
 <template>
   <div class="page">
     <header class="topbar">
-    <div class="navLeft">
-        <button class="iconBtn" type="button" @click="goBack" aria-label="Go back">←</button>
-    </div>
-
-    <nav class="topNav">
-        <router-link to="/" class="navLink">Home</router-link>
-
-        <a href="#" class="navLink" @click.prevent="scrollToSearchTop">
-        Search
-        </a>
-
-        <router-link to="/results" class="navLink">Organizations</router-link>
-
-        <select
-        class="languageSelect"
-        @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
-        >
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        </select>
-    </nav>
+      <button class="iconBtn" type="button" @click="goBack" aria-label="Go back">←</button>
+      <h1 class="title">Results</h1>
+      <div class="spacer" aria-hidden="true"></div>
     </header>
 
     <main class="main">
@@ -546,49 +446,26 @@ const filteredResults = computed(() => {
 }
 
 .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: var(--bar);
-  padding: 10px 24px;
-  display: flex;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
   align-items: center;
-  justify-content: space-between;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-.navLeft {
-  display: flex;
-  align-items: center;
-}
-
-.topNav {
-  display: flex;
-  gap: 18px;
-  align-items: center;
-}
-
-.navLink {
-  text-decoration: none;
+.title {
+  margin: 0;
+  text-align: center;
   font-family: "Cormorant Garamond", serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #2f3e36;
-  letter-spacing: 0.4px;
+  font-size: 28px;
+  font-weight: 800;
 }
 
-.navLink:hover {
-  color: var(--accent);
-}
-
-.languageSelect {
-  font-family: "Cormorant Garamond", serif;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.4px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-  color: #2f3e36;
-  cursor: pointer;
-}
+.spacer { width: 44px; height: 44px; }
 
 .iconBtn {
   width: 44px;

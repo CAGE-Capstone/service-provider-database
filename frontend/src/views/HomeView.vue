@@ -1,28 +1,29 @@
 <script setup>
 import { useRouter } from "vue-router";
 import homepageIcon from "../assets/icons/main-image-homepage.png";
-import { ref } from "vue";
+import housingIcon from "../assets/icons/house-symbol.png";
+import { ref, onMounted } from "vue";
 
 const router = useRouter();
 
-const language = ref("en");
+const locationQuery = ref("");
+const mapUrl = ref("https://www.google.com/maps?q=Walla%20Walla,%20WA&output=embed");
 
-const UI_CATEGORIES = [
-  "Food",
-  "Housing",
-  "Health",
-  "Education & Work",
-  "Legal & Financial",
-  "Transportation",
-  "Family Services",
-  "Community Programs"
+const handleLocationSearch = () => {
+  const q = locationQuery.value.trim();
+  if (!q) return;
+  mapUrl.value = `https://www.google.com/maps?q=${encodeURIComponent(q)}&output=embed`;
+};
+
+
+const language = ref("en");
+const languages = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
 ];
 
-const categories = ref(UI_CATEGORIES);
-const searchQuery = ref("");
-
-const translateToSpanish = window.translateToSpanish;
-const translateToEnglish = window.translateToEnglish;
+const translateToSpanish = window.translateToSpanish
+const translateToEnglish = window.translateToEnglish
 
 const scrollToSearch = () => {
   const section = document.getElementById("searchSection");
@@ -30,6 +31,13 @@ const scrollToSearch = () => {
     section.scrollIntoView({ behavior: "smooth" });
   }
 };
+
+function scrollToCategories() {
+  const el = document.getElementById("categories");
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth" });
+  }
+}
 
 function formatCategory(name) {
   if (!name) return "";
@@ -41,30 +49,39 @@ function formatCategory(name) {
 function categoryIcon(name) {
   const n = (name || "").toLowerCase();
 
-  if (n.includes("food")) return "🍽️";
   if (n.includes("housing")) return "🏠";
-  if (n.includes("health")) return "🩺";
-  if (n.includes("education") || n.includes("work")) return "🎓";
-  if (n.includes("legal") || n.includes("financial")) return "⚖️";
-  if (n.includes("transport")) return "🚌";
-  if (n.includes("community")) return "🤝";
-  if (n.includes("other")) return "⭐️";
+  if (n.includes("recovery")) return "🩹";
+  if (n.includes("mental")) return "🧠";       
+  if (n.includes("health")) return "🩹";        
+  if (n.includes("education")) return "🎓";
+  if (n.includes("food")) return "🍽️";
+  if (n.includes("employment") || n.includes("job")) return "🧑‍💼";
+  if (n.includes("art") || n.includes("culture")) return "🎨";       
+  if (n.includes("environment") || n.includes("animal")) return "🐾"; 
 
   return "⭐️";
 }
 
+const categories = ref([]);
+const searchQuery = ref('');
+
 function handleKeywordSearch(query) {
   if (!query) return;
-  router.push(`/results/keyword/${encodeURIComponent(query)}`);
+
+  router.push(`/results/keyword/${encodeURIComponent(query)}`)
 }
 
 function handleCategoryClick(cat) {
-  router.push(`/results/category/${encodeURIComponent(cat)}`);
+  router.push(`/results/category/${encodeURIComponent(cat)}`)
 }
 
 onMounted(async () => {
   try {
+<<<<<<< HEAD
     const res = await fetch('https://service-provider-database-lb3m.onrender.com/api/categories')
+=======
+    const res = await fetch('http://127.0.0.1:5000/api/categories')
+>>>>>>> parent of 795ae04 (Merge pull request #70 from CAGE-Capstone/Ella's-Extravagant-Branch)
       categories.value = await res.json()
   } catch (err) {
       console.error('Failed to fetch categories:', err)
@@ -197,6 +214,53 @@ onMounted(async () => {
             </div>
         </div>
       </section>
+
+      <!-- LOCATION / MAP -->
+      <section class="section" id="location">
+        <div class="container">
+          <div class="sectionHeader">
+            <h2 class="sectionTitle">Location</h2>
+            <p class="sectionDesc">Use location to find services closest to you.</p>
+          </div>
+
+          <div class="locationFull">
+            <div class="card">
+              <!-- Search row -->
+              <div class="blockSearch">
+                <input
+                  v-model="locationQuery"
+                  type="text"
+                  placeholder="Enter ZIP code or city"
+                  class="locationInput"
+                  @keydown.enter="handleLocationSearch"
+                />
+                <button
+                  class="primaryBtn locationBtn"
+                  type="button"
+                  @click="handleLocationSearch"
+                >
+                  Search
+                </button>
+              </div>
+
+              <!-- Map -->
+              <div class="map">
+                <iframe
+                  :src="mapUrl"
+                  width="100%"
+                  height="100%"
+                  style="border:0;"
+                  loading="lazy"
+                  allowfullscreen
+                  referrerpolicy="no-referrer-when-downgrade"
+                  title="Map"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       <!-- FOOTER -->
       <footer class="footer">
@@ -511,12 +575,13 @@ onMounted(async () => {
 }
 
 .label {
-  margin-top: 10px;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-weight: 500;
-  font-size: 15px;
+  margin-top: 12px;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 700;
+  font-size: 18px;
   color: #2f3e36;
   text-align: center;
+  white-space: nowrap;     
 }
 
 /* ===== Cards / two column section ===== */
@@ -549,6 +614,45 @@ onMounted(async () => {
   padding-left: 18px;
   color: var(--text-secondary);
   line-height: 1.7;
+}
+
+/* Map block */
+.blockSearch {
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.locationInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.map {
+  margin-top: 12px;
+  height: 240px;
+  background: #e5e7eb;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+
+/* ===== Location Search Styling ===== */
+
+.blockSearch {
+  background: var(--bg-surface);
+  border-radius: 999px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* Make input blend in */
