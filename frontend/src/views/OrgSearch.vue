@@ -53,7 +53,7 @@
 
     onMounted(async () => {
         try {
-            const res = await fetch('http://127.0.0.1:5000/api/categories')
+            const res = await fetch('https://service-provider-database-lb3m.onrender.com/api/categories')
             CATEGORIES.value = await res.json()
         } catch (err) {
             console.error('Failed to fetch categories:', err)
