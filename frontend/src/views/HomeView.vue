@@ -62,14 +62,14 @@ function handleCategoryClick(cat) {
   router.push(`/results/category/${encodeURIComponent(cat)}`);
 }
 
-onMounted(async () => {
-  try {
-    const res = await fetch('https://service-provider-database-lb3m.onrender.com/api/categories')
-      categories.value = await res.json()
-  } catch (err) {
-      console.error('Failed to fetch categories:', err)
-  }
-})
+// onMounted(async () => {
+//   try {
+//     const res = await fetch('https://service-provider-database-lb3m.onrender.com/api/categories')
+//       categories.value = await res.json()
+//   } catch (err) {
+//       console.error('Failed to fetch categories:', err)
+//   }
+// })
 
 // function handleCategoryClick(key) {
 //   if (key === "Food") {
