@@ -15,81 +15,141 @@ const UI_CATEGORIES = [
   "Community Programs"
 ];
 
-function mapToUICategory(raw) {
-  const c = String(raw || "").toUpperCase();
+function mapToUICategory(org) {
+  const category = String(org?.category || "").toUpperCase();
+  const name = String(org?.name || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]/g, "");
+  const details = String(org?.data?.[1] || "").toUpperCase();
+  const func = String(org?.data?.[7] || "").toUpperCase();
 
-  // FOOD
-  if (c.includes("FOOD")) return "Food";
+  const text = `${category} ${name} ${details} ${func}`;
 
-  // HOUSING
+// MANUAL LEGAL MATCHES
+if (
+  name.includes("BLUE MOUNTAIN ACTION COUNCIL") ||
+  name.includes("CLEAR HOTLINE") ||
+  name.includes("COLUMBIA LEGAL SERVICES") ||
+  name.includes("NEUTRAL GROUND DISPUTE RESOLUTION") ||
+  name.includes("NORTHWEST IMMIGRANTS RIGHTS PROJECT") ||
+  name.includes("NORTHWEST JUSTICE PROJECT") ||
+  name.includes("COURT APPOINTED SPECIAL ADVOCATES") ||
+  name.includes("LEGAL AID SERVICES OF OREGON") ||
+  name.includes("WALLA WALLA COUNTY CRIME VICTIM ADVOCATES") ||
+  name.includes("WASHINGTON CASA") ||
+  name.includes("COLLEGE PLACE POLICE") ||
+  name.includes("COLUMBIA COUNTY SHERIFF") ||
+  name.includes("MILTON-FREEWATER POLICE") ||
+  name.includes("NON-EMERGENCY DISPATCH") ||
+  name.includes("UMATILLA COUNTY SHERIFF") ||
+  name.includes("WALLA WALLA COUNTY SHERIFF") ||
+  name.includes("WALLA WALLA POLICE") ||
+  name.includes("COUNSELING SERVICES FOR DV OFFENDERS") ||
+  name.includes("NATIONAL CHILD ABUSE HOTLINE") ||
+  name.includes("OREGON CHILDREN'S SERVICES") ||
+  name.includes("OREGON SAFENET") ||
+  name.includes("UMATILLA -MORROW DV CRISIS LINE") ||
+  name.includes("WASHINGTON ADULT AND CHILD PROTECTIVE SERVICES") ||
+  name.includes("YWCA LINC") ||
+  name.includes("YWCA 24 HOUR CRISIS LINE") ||
+  name.includes("WALLA WALLA VALLEY DIVERGENCE") ||
+  name.includes("WALLA WALLA LEAD") ||
+  name.includes("YWCA HUMAN TRAFFICKING ADVOCACY")
+) {
+  return "Legal & Financial";
+}
+
+// MANUAL FAMILY SERVICES MATCHES
+if (
+  // Parenting, Childcare & Early Learning
+  name.includes("MY FRIENDS HOUSE PRESCHOOL") ||
+  name.includes("ADVENTURE CLUB") ||
+  name.includes("KIDS KORNER") ||
+  name.includes("LITTLE OWLS PRESCHOOL") ||
+  name.includes("EARLY LEARNING CENTER") ||
+  name.includes("CHILD CARE AWARE") ||
+  name.includes("OREGON CHILD DEVELOPMENT COALITION") ||
+  name.includes("HEAD START") ||
+  name.includes("THE KIDS PLACE") ||
+
+  // Parenting Education & Family Support
+  name.includes("WWCC PARENT EDUCATION") ||
+  name.includes("PARENT CO OP") ||
+  name.includes("PARENT CO-OP") ||
+  name.includes("EARLY LEARNING COALITION") ||
+  name.includes("CATHOLIC CHARITIES") ||
+
+  // Youth Programs
+  name.includes("FRIENDS OF CHILDREN") ||
+  name.includes("CAMP FIRE") ||
+  name.includes("PARKS AND RECREATION") ||
+  name.includes("PARKS & RECREATION") ||
+  name.includes("4 H CLUB") ||
+
+  //Family / Child Welfare
+  name.includes("CHILDRENS HOME SOCIETY") ||
+  name.includes("CHILDREN'S HOME SOCIETY") ||
+  name.includes("DIVISION OF CHILDREN AND FAMILY SERVICES") ||
+  name.includes("GOOD SAMARITAN MINISTRIES")
+) {
+  return "Family Services";
+}
+
+  // MANUAL TRANSPORTATION MATCHES
   if (
-    c.includes("HOUSING") ||
-    c.includes("SHELTER") ||
-    c.includes("HOMELESS") ||
-    c.includes("RENT") ||
-    c.includes("UTILITY")
+    name.includes("COLUMBIA COUNTY PUBLIC TRANSPORTATION") ||
+    name.includes("GORGE TRANSLINK") ||
+    name.includes("GRAPELINE BUS LINE") ||
+    name.includes("KAYAK BUS LINE") ||
+    name.includes("MILTON-FREEWATER CITY BUS") ||
+    name.includes("PEOPLE FOR PEOPLE MEDICAID TRANSPORTATION") ||
+    name.includes("VALLEY TRANSIT BUS SERVICE") ||
+    name.includes("VALLEY TRANSIT DIAL-A-RIDE") ||
+    name.includes("VALLEY TRANSIT JOB ACCESS") ||
+    name.includes("VETERANS TRANSPORTATION SERVICE")
+  ) {
+    return "Transportation";
+  }
+
+  if (text.includes("FOOD")) return "Food";
+
+  if (
+    text.includes("HOUSING") ||
+    text.includes("SHELTER") ||
+    text.includes("HOMELESS") ||
+    text.includes("RENT") ||
+    text.includes("UTILITY") ||
+    text.includes("UTILITIES")
   ) {
     return "Housing";
   }
 
-  // HEALTH
-  if (c.includes("HEALTH") || c.includes("MENTAL")) {
+  if (
+    text.includes("HEALTH") ||
+    text.includes("MENTAL") ||
+    text.includes("MEDICAL") ||
+    text.includes("COUNSELING") ||
+    text.includes("CLINIC")
+  ) {
     return "Health";
   }
 
-  // EDUCATION + WORK
   if (
-    c.includes("EDUCATION") ||
-    c.includes("EMPLOYMENT")
+    text.includes("EDUCATION") ||
+    text.includes("EMPLOYMENT") ||
+    text.includes("WORK") ||
+    text.includes("JOB") ||
+    text.includes("SCHOOL") ||
+    text.includes("COLLEGE")
   ) {
     return "Education & Work";
-  }
-
-  // LEGAL + FINANCIAL
-  if (
-    c.includes("LEGAL") ||
-    c.includes("LAW") ||
-    c.includes("FINANCE")
-  ) {
-    return "Legal & Financial";
-  }
-
-  // TRANSPORTATION
-  if (c.includes("TRANSPORT")) {
-    return "Transportation";
-  }
-
-  // FAMILY SERVICES
-  if (
-    c.includes("PARENT") ||
-    c.includes("CHILD") ||
-    c.includes("YOUTH") ||
-    c.includes("AGING") ||
-    c.includes("SENIOR") ||
-    c.includes("DISABILITY")
-  ) {
-    return "Family Services";
-  }
-
-  // COMMUNITY PROGRAMS
-  if (
-    c.includes("RELIGIOUS") ||
-    c.includes("ART") ||
-    c.includes("CULTURE") ||
-    c.includes("HUMANITIES") ||
-    c.includes("ENVIRONMENT") ||
-    c.includes("ANIMAL") ||
-    c.includes("COMMUNITY")
-  ) {
-    return "Community Programs";
   }
 
   return "Community Programs";
 }
 
 const filterMenuOpen = ref(false);
-const selectedCategories = ref([]);     
-const selectedDemographics = ref([]);   
+const selectedCategories = ref([]);       
 
 const language = ref("en");
 const translateToSpanish = window.translateToSpanish
@@ -97,15 +157,6 @@ const translateToEnglish = window.translateToEnglish
 
 const categoryOptions = ["All", ...UI_CATEGORIES];
 
-const demographicOptions = ref([
-  "All",
-  "Youth",
-  "Seniors",
-  "Veterans",
-  "Disability",
-  "LGBTQ+",
-  "Low Income",
-]);
 
 function toggleCategory(value) {
   if (value === "All") {
@@ -116,23 +167,12 @@ function toggleCategory(value) {
   selectedCategories.value = [value];
 }
 
-function toggleDemographic(value) {
-  if (value === "All") {
-    selectedDemographics.value = [];
-    return;
-  }
-  const arr = [...selectedDemographics.value];
-  const i = arr.indexOf(value);
-  if (i >= 0) arr.splice(i, 1);
-  else arr.push(value);
-  selectedDemographics.value = arr;
-}
 
 const activeFilterLabel = computed(() => {
-  const parts = [];
-  if (selectedCategories.value.length) parts.push(`${selectedCategories.value.length} categories`);
-  if (selectedDemographics.value.length) parts.push(`${selectedDemographics.value.length} demographics`);
-  return parts.length ? parts.join(" • ") : "All";
+  if (selectedCategories.value.length) {
+    return `${selectedCategories.value.length} categories`;
+  }
+  return "All";
 });
 
 const route = useRoute();
@@ -145,14 +185,15 @@ const loading = ref(true);
 const errorMsg = ref("");
 
 const searchText = ref("");
-const sortBy = ref("relevance"); 
+const sortBy = ref("az");
 const sortMenuOpen = ref(false);
 
 const sortLabel = computed(() => {
-  if (sortBy.value === "az") return "Alphabetical";
-  if (sortBy.value === "distance") return "Distance";
-  return "Relevance";
+  if (sortBy.value === "az") return "A → Z";
+  if (sortBy.value === "za") return "Z → A";
+  return "A → Z";
 });
+
 function setSort(option) {
   sortBy.value = option;
   sortMenuOpen.value = false;
@@ -201,10 +242,10 @@ const subcategories = computed(() => {
   // use selected filter category first, otherwise route category/search
   if (selectedCategories.value.length) {
     const picked = selectedCategories.value[0];
-    list = list.filter(o => mapToUICategory(o.category) === picked);
+    list = list.filter(o => mapToUICategory(o) === picked);
   } else {
     if (type.value === "category") {
-      list = list.filter(o => mapToUICategory(o.category) === query.value);
+      list = list.filter(o => mapToUICategory(o) === query.value);
     } else if (query.value) {
       list = list.filter(o =>
         String(o.name || "").toUpperCase().includes(query.value.toUpperCase())
@@ -212,14 +253,6 @@ const subcategories = computed(() => {
     }
   }
 
-  // demographic filter
-  if (selectedDemographics.value.length) {
-    list = list.filter(o => {
-      const d = (o.demographic || o.demographics || o.population || "");
-      const hay = Array.isArray(d) ? d.join(" ").toLowerCase() : String(d).toLowerCase();
-      return selectedDemographics.value.some(sel => hay.includes(sel.toLowerCase()));
-    });
-  }
 
   // search within results
   const q = searchText.value.trim().toLowerCase();
@@ -250,10 +283,6 @@ const headerText = computed(() => {
 
   if (activeCat) parts.push(activeCat);
   else if (query.value) parts.push(`"${query.value}"`);
-
-  if (selectedDemographics.value.length) {
-    parts.push(`Demographic: ${selectedDemographics.value.join(", ")}`);
-  }
 
   if (selectedSubcategory.value !== "All") {
     parts.push(`Sub-Category: ${selectedSubcategory.value}`);
@@ -306,24 +335,15 @@ const filteredResults = computed(() => {
   // selected filter category overrides route category
   if (selectedCategories.value.length) {
     const picked = selectedCategories.value[0];
-    list = list.filter(o => mapToUICategory(o.category) === picked);
+    list = list.filter(o => mapToUICategory(o) === picked);
   } else {
     if (type.value === "category") {
-      list = list.filter(o => mapToUICategory(o.category) === query.value);
+      list = list.filter(o => mapToUICategory(o) === query.value);
     } else if (query.value) {
       list = list.filter(o =>
         String(o.name || "").toUpperCase().includes(query.value.toUpperCase())
       );
     }
-  }
-
-  // demographic filter
-  if (selectedDemographics.value.length) {
-    list = list.filter(o => {
-      const d = (o.demographic || o.demographics || o.population || "");
-      const hay = Array.isArray(d) ? d.join(" ").toLowerCase() : String(d).toLowerCase();
-      return selectedDemographics.value.some(sel => hay.includes(sel.toLowerCase()));
-    });
   }
 
   // search within results
@@ -337,17 +357,17 @@ const filteredResults = computed(() => {
     list = list.filter(org => getOrgSubcats(org).includes(selectedSubcategory.value));
   }
 
-  // sort
-  if (sortBy.value === "az") {
-    list = [...list].sort((a, b) =>
-      String(a?.name ?? "").trim().toLowerCase()
-        .localeCompare(String(b?.name ?? "").trim().toLowerCase())
-    );
-  } else if (sortBy.value === "distance") {
-    if (list.some(o => o.distance != null)) {
-      list = [...list].sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
-    }
-  }
+if (sortBy.value === "az") {
+  list = [...list].sort((a, b) =>
+    String(a?.name ?? "").trim().toLowerCase()
+      .localeCompare(String(b?.name ?? "").trim().toLowerCase())
+  );
+} else if (sortBy.value === "za") {
+  list = [...list].sort((a, b) =>
+    String(b?.name ?? "").trim().toLowerCase()
+      .localeCompare(String(a?.name ?? "").trim().toLowerCase())
+  );
+}
 
   return list;
 });
@@ -362,22 +382,26 @@ const filteredResults = computed(() => {
         <button class="iconBtn" type="button" @click="goBack" aria-label="Go back">←</button>
     </div>
 
+    <div class="centerTitle">
+      Search
+    </div>
+
     <nav class="topNav">
-        <router-link to="/" class="navLink">Home</router-link>
+      <router-link to="/" class="navLink">Home</router-link>
 
-        <a href="#" class="navLink" @click.prevent="scrollToSearchTop">
+      <router-link to="/results" class="navLink">
         Search
-        </a>
+      </router-link>
 
-        <router-link to="/results" class="navLink">Organizations</router-link>
+      <router-link to="/about" class="navLink">About</router-link>
 
-        <select
+      <select
         class="languageSelect"
         @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
-        >
+      >
         <option value="en">English</option>
         <option value="es">Español</option>
-        </select>
+      </select>
     </nav>
     </header>
 
@@ -407,15 +431,13 @@ const filteredResults = computed(() => {
             </button>
 
             <div v-if="sortMenuOpen" class="menu" role="menu" @click.stop>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('relevance')">
-                Relevance
-                </button>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('az')">
+              <button class="menuItem" @click="setSort('az')">
                 Alphabetical (A–Z)
-                </button>
-                <button class="menuItem" type="button" role="menuitem" @click="setSort('distance')">
-                Distance
-                </button>
+              </button>
+
+              <button class="menuItem" @click="setSort('za')">
+                Alphabetical (Z–A)
+              </button>
             </div>
             </div>
 
@@ -445,27 +467,11 @@ const filteredResults = computed(() => {
             <span class="check" v-if="selectedCategories.includes(c)">✓</span>
         </button>
 
-        <div class="menuDivider"></div>
-
-        <div class="menuSectionTitle">Demographic</div>
-
-        <button
-            v-for="d in demographicOptions"
-            :key="`demo-${d}`"
-            class="menuItem"
-            :class="{ selected: selectedDemographics.includes(d) }"
-            type="button"
-            @click="toggleDemographic(d)"
-        >
-            <span>{{ d }}</span>
-            <span class="check" v-if="selectedDemographics.includes(d)">✓</span>
-        </button>
-
         <div class="menuFooter">
             <button
             class="menuAction"
             type="button"
-            @click="selectedCategories = []; selectedDemographics = []"
+            @click="selectedCategories = []"
             >
             Clear
             </button>
@@ -521,7 +527,7 @@ const filteredResults = computed(() => {
               <span class="chev" aria-hidden="true">›</span>
             </div>
 
-            <p class="meta" v-if="org.category">Category: {{ org.category }}</p>
+            <p class="meta">Category: {{ mapToUICategory(org) }}</p>
           </article>
         </div>
       </section>
@@ -808,6 +814,17 @@ const filteredResults = computed(() => {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
+}
+
+.centerTitle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Cormorant Garamond", serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f3e36;
+  white-space: nowrap;
 }
 
 .cardTitle { margin: 0; font-size: 18px; font-weight: 900; }
