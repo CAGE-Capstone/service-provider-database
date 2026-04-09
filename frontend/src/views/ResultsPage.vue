@@ -28,14 +28,15 @@ const DEMOGRAPHIC_OPTIONS = [
 ];
 
 function forwardScroll(e) {
+  if (e.target.closest(".menu")) return;
+
   const el = resultsScrollRef.value;
   if (!el) return;
 
-  const canScroll = el.scrollHeight > el.clientHeight;
-  if (!canScroll) return;
-
-  el.scrollTop += e.deltaY;
-  e.preventDefault();
+  if (el.scrollHeight > el.clientHeight) {
+    el.scrollTop += e.deltaY;
+    e.preventDefault();
+  }
 }
 
 function syncFiltersFromRoute() {
@@ -749,8 +750,10 @@ onBeforeUnmount(() => {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(0, 0, 0, 0.08);
   z-index: 999;
-  max-height: 420px;
-  overflow-y: auto;
+
+  max-height: 60vh;   
+  overflow-y: auto;   
+
 }
 
 .menuSectionTitle {
