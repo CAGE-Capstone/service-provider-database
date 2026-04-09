@@ -483,24 +483,7 @@ if (sortBy.value === "az") {
         </div>
         </div>
       </div>
-
-      <!-- Sub-categories (UI only, optional data effect) -->
-      <section class="subcats">
-        <h2 class="subcatsLabel">Sub-Categories</h2>
-        <div class="subcatsRow">
-          <button
-            v-for="s in subcategories"
-            :key="s"
-            class="subcatChip"
-            :class="{ active: selectedSubcategory === s }"
-            type="button"
-            @click="selectedSubcategory = s"
-          >
-            {{ s }}
-          </button>
-        </div>
-      </section>
-
+      
       <!-- Results -->
       <section class="resultsSection">
         <div class="resultsHeader">
@@ -537,9 +520,10 @@ if (sortBy.value === "az") {
 
 <style scoped>
 .page {
-  --bar: #e6e6e6;
-  --pill: #efefef;
-  --card: #dedede;
+  --bar: #DBE2EF;
+  --pill: #F5F5F5;
+  --card: #F5F5F5;
+  --chip: #F0F0F0;
   --ink: #2f3e36;
   --muted: #4b5563;
   --accent: #2563eb;
@@ -728,7 +712,7 @@ if (sortBy.value === "az") {
 .chipBtn {
   flex: 1;
   border: none;
-  background: #e2e2e2;
+  background: var(--chip);
   border-radius: 999px;
   padding: 10px 12px;
   font-weight: 800;
