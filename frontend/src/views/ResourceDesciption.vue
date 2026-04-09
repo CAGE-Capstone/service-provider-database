@@ -5,9 +5,8 @@ import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
-const language = ref("en");
-const translateToSpanish = window.translateToSpanish
-const translateToEnglish = window.translateToEnglish
+const translateToSpanish = window.translateToSpanish;
+const translateToEnglish = window.translateToEnglish;
 
 const scrollToSearch = async () => {
   if (router.currentRoute.value.path !== "/") {
@@ -21,7 +20,7 @@ const scrollToSearch = async () => {
   }
 };
 
-const organizations = ref([])
+const organizations = ref([]);
 
 onMounted(async () => {
   try {
@@ -38,10 +37,7 @@ const resource = computed(() => {
 
   if (!organizations.value.length) return null;
 
-  const found = organizations.value.find(
-    (org) => org.name === id
-  );
-
+  const found = organizations.value.find((org) => org.name === id);
   if (!found) return null;
 
   const row = found.data;
@@ -55,42 +51,13 @@ const resource = computed(() => {
     contact: row[3] || "",
     email: row[4] || "",
     address: row[5] || "",
-    website: row[6] || "",
-    services: row[7]
-      ? row[7].split(",").map((s) => s.trim())
-      : [],
-    hours: []
+    website: row[6] || ""
   };
 });
 
-
-/**
- * TEMP Data
- */
-// const MOCK_RESOURCES = [
-//   {
-//     id: "BMAC Food Bank",
-//     name: "BMAC Food Bank",
-//     phone: "(509) 529-4980",
-//     email: "No email provided",
-//     description:
-//       "Provides food assistance through community pantries and distribution programs. The lead volunteer is Trevor Sandjathe.",
-//     hours: ["Mon–Fri: 9am–4pm", "Sat: 10am–2pm"],
-//     services: ["Food pantry", "Meal distribution", "Emergency groceries"],
-//     website: "https://www.bmacww.org/programs/food",
-//     address: "921 W Cherry Street, Walla Walla, WA 99362",
-//     mapQuery: "921 W Cherry Street, Walla Walla, WA 99362",
-//   },
-// ];
-
-// const resource = computed(() => {
-//   const id = route.params.id;
-//   return MOCK_RESOURCES.find((r) => r.id === id) || null;
-// });
-
 const mapUrl = computed(() => {
   if (!resource.value) return "";
-  const q = encodeURIComponent(resource.value.mapQuery || resource.value.address || "");
+  const q = encodeURIComponent(resource.value.address || "");
   return `https://www.google.com/maps?q=${q}&output=embed`;
 });
 
@@ -101,36 +68,30 @@ function goBack() {
 
 <template>
   <div class="page">
-    <!-- TOP BAR -->
-        <header class="topbar">
-        <!-- LEFT: Back -->
-        <button class="backBtn" type="button" @click="goBack" aria-label="Back">
-            ←
-        </button>
+    <header class="topbar">
+      <button class="backBtn" type="button" @click="goBack" aria-label="Back">
+        ←
+      </button>
 
-        <!-- CENTER: Title -->
-        <h1 class="title">{{ resource?.name || "Resource" }}</h1>
+      <h1 class="title">{{ resource?.name || "Resource" }}</h1>
 
-        <!-- RIGHT: Nav + Language -->
-        <nav class="topNav">
-            <router-link to="/" class="navLink">Home</router-link>
+      <nav class="topNav">
+        <router-link to="/" class="navLink">Home</router-link>
+        <router-link to="/results" class="navLink">Search</router-link>
+        <router-link to="/about" class="navLink">About</router-link>
 
-            <a href="#" class="navLink" @click.prevent="scrollToSearch">Search</a>
-
-            <router-link to="/results" class="navLink">Organizations</router-link>
-            <!-- <router-link to="/about" class="navLink">About</router-link> -->
-
-            <select class="languageSelect" @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()">
-            <option value="en">English</option>
-            <option value="es">Español</option>
-            </select>
-        </nav>
-        </header>
-
+        <select
+          class="languageSelect"
+          @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+        >
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </nav>
+    </header>
 
     <main class="content" v-if="resource">
-      <!-- CONTACT -->
-      <section class="section">
+      <section class="section" v-if="resource.phone || resource.email">
         <h2 class="sectionTitle">Contact</h2>
 
         <div class="pillList">
@@ -146,38 +107,13 @@ function goBack() {
         </div>
       </section>
 
-      <!-- DESCRIPTION -->
-      <section class="section">
+      <section class="section" v-if="resource.description">
         <h2 class="sectionTitle">Description</h2>
         <div class="card">
           <p class="bodyText">{{ resource.description }}</p>
         </div>
       </section>
 
-      <!-- HOURS + SERVICES -->
-      <section class="section">
-        <div class="twoCol">
-          <div>
-            <h2 class="sectionTitle">Hours</h2>
-            <div class="card">
-              <ul class="list">
-                <li v-for="(h, i) in resource.hours" :key="i">{{ h }}</li>
-              </ul>
-            </div>
-          </div>
-
-          <div>
-            <h2 class="sectionTitle">Services</h2>
-            <div class="card">
-              <ul class="list">
-                <li v-for="(s, i) in resource.services" :key="i">{{ s }}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- WEBSITE -->
       <section class="section" v-if="resource.website">
         <h2 class="sectionTitle">Website</h2>
         <a class="pill" :href="resource.website" target="_blank" rel="noreferrer">
@@ -185,8 +121,7 @@ function goBack() {
         </a>
       </section>
 
-      <!-- DIRECTIONS + MAP -->
-      <section class="section">
+      <section class="section" v-if="resource.address">
         <h2 class="sectionTitle">Directions</h2>
 
         <div class="card">
@@ -219,117 +154,112 @@ function goBack() {
 <style scoped>
 .page {
   --bg-page: #ffffff;
-  --bg-header: #e7e7e7;
-  --bg-card: #f4f4f4;
+  --bg-header: #DBE2EF;
+  --bg-card: #F5F5F5;
 
-  --text-primary: #111111;
-  --text-secondary: #334155;
+  --text-primary: #2f3e36;
+  --text-secondary: #4b5563;
+  --accent: #2563eb;
 
   min-height: 100vh;
   background: var(--bg-page);
   color: var(--text-primary);
-  font-family: var(--font-body, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
-/* Top bar */
-    .topbar {
-    background: var(--bg-header);
-    padding: 14px 18px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    }
+.topbar {
+  background: var(--bg-header);
+  padding: 14px 18px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    /* left back button pinned */
-    .backBtn {
-    position: absolute;
-    left: 18px;
-    width: 44px;
-    height: 44px;
-    border-radius: 999px;
-    border: none;
-    background: var(--bg-card);
-    font-size: 20px;
-    cursor: pointer;
-    }
+.backBtn {
+  position: absolute;
+  left: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 20px;
+  cursor: pointer;
+}
 
-    /* centered title */
-    .title {
-    margin: 0;
-    font-family: "Cormorant Garamond", serif;
-    font-size: 26px;
-    font-weight: 700;
-    }
+.title {
+  margin: 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #2f3e36;
+}
 
-    /* right nav pinned */
-    .topNav {
-    position: absolute;
-    right: 18px;
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    }
+.topNav {
+  position: absolute;
+  right: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
 
-    .navLink {
-    text-decoration: none;
-    font-family: "Cormorant Garamond", serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #2f3e36;
-    }
+.navLink {
+  text-decoration: none;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3e36;
+}
 
-    .navLink:hover {
-    color: #2563eb;
-    }
+.navLink:hover {
+  color: var(--accent);
+}
 
-    .languageSelect {
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    background: #fff;
-    font-family: "Cormorant Garamond", serif;
-    font-size: 16px;
-    color: #2f3e36;
-    cursor: pointer;
-    }
+.languageSelect {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 16px;
+  color: #2f3e36;
+  cursor: pointer;
+}
 
-
-/* Layout */
 .content {
-  padding: 18px 16px 34px;
+  padding: 24px 16px 40px;
   max-width: 900px;
   margin: 0 auto;
 }
 
 .section {
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .sectionTitle {
-  margin: 0 0 10px;
-  font-family: var(--font-title, "Cormorant Garamond", serif);
+  margin: 0 0 12px;
+  font-family: "Cormorant Garamond", serif;
   font-size: 26px;
   font-weight: 700;
+  color: #2f3e36;
 }
 
 .card {
   background: var(--bg-card);
   border-radius: 16px;
-  padding: 14px;
+  padding: 16px;
 }
 
 .bodyText {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.7;
-  font-family: var(--font-body, system-ui, -apple-system, Segoe UI, Roboto, sans-serif);
 }
 
-/* Pills */
 .pillList {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pill {
@@ -338,7 +268,7 @@ function goBack() {
   align-items: center;
   background: var(--bg-card);
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   text-decoration: none;
   color: inherit;
 }
@@ -353,30 +283,8 @@ function goBack() {
   overflow-wrap: anywhere;
 }
 
-/* Lists */
-.list {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-/* Hours/services grid */
-.twoCol {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
-@media (min-width: 850px) {
-  .twoCol {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-/* Map */
 .map {
-  margin-top: 12px;
+  margin-top: 14px;
   height: 300px;
   border-radius: 14px;
   overflow: hidden;
