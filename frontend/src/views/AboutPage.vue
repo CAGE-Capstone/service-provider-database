@@ -97,8 +97,9 @@ function goBack() {
           <div class="stepContent">
             <h3 class="stepTitle">Refine your results</h3>
             <p class="text">
-              Use the sort and filter options to narrow your results and find
-              services more easily.
+            Use the sort and filter options to narrow your results by category or 
+            demographic group (such as age, gender, or community), helping you find 
+            more relevant services.
             </p>
           </div>
         </div>
