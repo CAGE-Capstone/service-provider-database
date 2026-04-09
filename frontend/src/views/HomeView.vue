@@ -83,15 +83,16 @@ function handleCategoryClick(cat) {
       <nav class="topNav">
         <router-link to="/" class="navLink">Home</router-link>
 
-        <a href="#" class="navLink" @click.prevent="scrollToSearch">
+        <router-link to="/results" class="navLink">
           Search
-        </a>
+        </router-link>
 
-        <router-link to="/results" class="navLink">Organizations</router-link>
-        <!-- <router-link to="/about" class="navLink">About</router-link> -->
+        <router-link to="/about" class="navLink">About</router-link>
 
-        <!-- LANGUAGE DROPDOWN -->
-        <select class="languageSelect" @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()">
+        <select
+          class="languageSelect"
+          @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+        >
           <option value="en">English</option>
           <option value="es">Español</option>
         </select>
@@ -104,8 +105,8 @@ function handleCategoryClick(cat) {
         <div class="container heroInner">
           <div class="heroText">
 
-          <!-- <p class="eyebrow">Community Resource Directory</p> -->
-          <h1 class="brand">Community Resource Directory</h1>
+          <!-- <p class="eyebrow">Walla Walla Community Resources</p> -->
+          <h1 class="brand">Walla Walla Community Resources</h1>
           <p class="subhead">
             Find services faster — browse categories, filter results, and view key contact details.
           </p>
