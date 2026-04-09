@@ -437,20 +437,18 @@ onBeforeUnmount(() => {
 
     <main class="main">
       <section class="stickyTop">
-        <div class="searchPill" role="search" aria-label="Search results">
-          <input
-            class="searchInput"
-            v-model="searchText"
-            @keyup.enter="applySearch"
-            placeholder="Search by keyword or organization"
-          />
-          <button
-            class="searchIconBtn"
-            type="button"
-            @click="applySearch"
-            aria-label="Search"
-          >
-            <span class="searchIcon" aria-hidden="true">🔍</span>
+        <div class="searchRow">
+          <div class="searchPill" role="search" aria-label="Search results">
+            <input
+              class="searchInput"
+              v-model="searchText"
+              @keyup.enter="applySearch"
+              placeholder="Search"
+            />
+          </div>
+
+          <button class="primaryBtn" type="button" @click="applySearch">
+            Search
           </button>
         </div>
 
@@ -670,14 +668,22 @@ onBeforeUnmount(() => {
   padding-bottom: 18px;
 }
 
+.searchRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .searchPill {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 10px;
   background: var(--pill);
   border-radius: 999px;
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  padding: 14px 18px;
+  min-width: 0;
 }
 
 .searchInput {
@@ -702,6 +708,21 @@ onBeforeUnmount(() => {
 .searchIcon {
   opacity: 0.7;
   font-size: 18px;
+}
+
+.primaryBtn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.primaryBtn:hover {
+  opacity: 0.95;
 }
 
 .controlsRow {
