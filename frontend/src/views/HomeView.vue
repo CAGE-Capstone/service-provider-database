@@ -472,12 +472,28 @@ function handleCategoryClick(cat) {
   opacity: 0.75;
 }
 
-/* ===== Categories grid ===== */
+/* ===== Category grid ===== */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
   justify-content: center;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
 }
 
 .catCard {
@@ -486,6 +502,26 @@ function handleCategoryClick(cat) {
   margin: 0 auto;
 }
 
+/* MOBILE */
+@media (max-width: 600px) {
+  .catCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .iconBox {
+    height: 72px;
+  }
+
+  .emoji {
+    font-size: 24px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+}
 
 .catCard {
   background: transparent;
