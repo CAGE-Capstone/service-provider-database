@@ -1,10 +1,12 @@
 <script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 const translateToSpanish = window.translateToSpanish;
 const translateToEnglish = window.translateToEnglish;
+const menuOpen = ref(false);
 
 function goBack() {
   router.back();
@@ -22,21 +24,45 @@ function goBack() {
         About Walla Walla Community Resources
       </div>
 
-      <div class="right">
-        <nav class="topNav">
-          <router-link to="/" class="navLink">Home</router-link>
-          <router-link to="/results" class="navLink">Search</router-link>
-          <router-link to="/about" class="navLink">About</router-link>
+            <div class="right">
+            <button
+                class="menuBtn"
+                type="button"
+                @click="menuOpen = !menuOpen"
+                aria-label="Open menu"
+                :aria-expanded="menuOpen"
+            >
+                ☰
+            </button>
 
-          <select
-            class="languageSelect"
-            @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
-          >
-            <option value="en">English</option>
-            <option value="es">Español</option>
-          </select>
-        </nav>
-      </div>
+            <nav class="topNav desktopNav">
+                <router-link to="/" class="navLink">Home</router-link>
+                <router-link to="/results" class="navLink">Search</router-link>
+                <router-link to="/about" class="navLink">About</router-link>
+
+                <select
+                class="languageSelect"
+                @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+                >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                </select>
+            </nav>
+
+            <div v-if="menuOpen" class="mobileMenu">
+                <router-link to="/" class="mobileNavLink" @click="menuOpen = false">Home</router-link>
+                <router-link to="/results" class="mobileNavLink" @click="menuOpen = false">Search</router-link>
+                <router-link to="/about" class="mobileNavLink" @click="menuOpen = false">About</router-link>
+
+                <select
+                class="languageSelect mobileLanguageSelect"
+                @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+                >
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                </select>
+            </div>
+            </div>
     </header>
 
     <main class="main">
@@ -195,6 +221,60 @@ function goBack() {
   font-size: 20px;
 }
 
+.menuBtn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-size: 24px;
+  color: #2f3e36;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 24px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+  z-index: 999;
+}
+
+.mobileNavLink {
+  text-decoration: none;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3e36;
+  padding: 6px 4px;
+}
+
+.mobileLanguageSelect {
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .desktopNav {
+    display: none;
+  }
+
+  .menuBtn {
+    display: block;
+  }
+
+  .centerTitle {
+    max-width: 52%;
+  }
+}
+
 .centerTitle {
   position: absolute;
   left: 50%;
@@ -327,12 +407,13 @@ function goBack() {
     gap: 12px;
   }
 
-  .centerTitle {
-    font-size: 16px;
-    max-width: 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.centerTitle {
+  font-size: 15px;
+  max-width: 60%;
+  text-align: center;
+  line-height: 1.2;
+  white-space: normal;
+}
 
   .topNav {
     gap: 10px;

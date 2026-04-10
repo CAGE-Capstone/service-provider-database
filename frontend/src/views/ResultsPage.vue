@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 
 const allOrgs = ref([]);
 const resultsScrollRef = ref(null);
+const menuOpen = ref(false);
 
 const UI_CATEGORIES = [
   "Food",
@@ -421,7 +422,17 @@ onBeforeUnmount(() => {
 
       <div class="centerTitle">Search</div>
 
-      <nav class="topNav">
+      <button
+        class="menuBtn"
+        type="button"
+        @click="menuOpen = !menuOpen"
+        aria-label="Open menu"
+        :aria-expanded="menuOpen"
+      >
+        ☰
+      </button>
+
+      <nav class="topNav desktopNav">
         <router-link to="/" class="navLink">Home</router-link>
         <router-link to="/results" class="navLink">Search</router-link>
         <router-link to="/about" class="navLink">About</router-link>
@@ -434,6 +445,20 @@ onBeforeUnmount(() => {
           <option value="es">Español</option>
         </select>
       </nav>
+
+      <div v-if="menuOpen" class="mobileMenu">
+        <router-link to="/" class="mobileNavLink" @click="menuOpen = false">Home</router-link>
+        <router-link to="/results" class="mobileNavLink" @click="menuOpen = false">Search</router-link>
+        <router-link to="/about" class="mobileNavLink" @click="menuOpen = false">About</router-link>
+
+        <select
+          class="languageSelect mobileLanguageSelect"
+          @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+        >
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
     </header>
 
     <main class="main">
@@ -667,6 +692,64 @@ onBeforeUnmount(() => {
   flex-shrink: 0;
   background: #fff;
   padding-bottom: 18px;
+}
+
+.menuBtn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.75);
+  cursor: pointer;
+  font-size: 24px;
+  color: #2f3e36;
+  z-index: 2;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 16px;
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+  z-index: 999;
+}
+
+.mobileNavLink {
+  text-decoration: none;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3e36;
+  padding: 6px 4px;
+}
+
+.mobileLanguageSelect {
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .desktopNav {
+    display: none;
+  }
+
+  .menuBtn {
+    display: block;
+  }
+
+  .centerTitle {
+    font-size: 22px;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .searchRow {
