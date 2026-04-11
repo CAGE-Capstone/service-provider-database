@@ -6,6 +6,7 @@ import { ref } from "vue";
 const router = useRouter();
 
 const language = ref("en");
+const menuOpen = ref(false);
 
 const UI_CATEGORIES = [
   "Food",
@@ -86,16 +87,21 @@ function handleCategoryClick(cat) {
 
   <!-- TOP BAR -->
     <header class="topbar">
-      <div class="navLeft">
-      </div>
+      <div class="navLeft"></div>
 
-      <nav class="topNav">
+      <button
+        class="menuBtn"
+        type="button"
+        @click="menuOpen = !menuOpen"
+        aria-label="Open menu"
+        :aria-expanded="menuOpen"
+      >
+        ☰
+      </button>
+
+      <nav class="topNav desktopNav">
         <router-link to="/" class="navLink">Home</router-link>
-
-        <router-link to="/results" class="navLink">
-          Search
-        </router-link>
-
+        <router-link to="/results" class="navLink">Search</router-link>
         <router-link to="/about" class="navLink">About</router-link>
 
         <select
@@ -106,6 +112,20 @@ function handleCategoryClick(cat) {
           <option value="es">Español</option>
         </select>
       </nav>
+
+      <div v-if="menuOpen" class="mobileMenu">
+        <router-link to="/" class="mobileNavLink" @click="menuOpen = false">Home</router-link>
+        <router-link to="/results" class="mobileNavLink" @click="menuOpen = false">Search</router-link>
+        <router-link to="/about" class="mobileNavLink" @click="menuOpen = false">About</router-link>
+
+        <select
+          class="languageSelect mobileLanguageSelect"
+          @change="$event.target.value === 'es' ? translateToSpanish() : translateToEnglish()"
+        >
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
     </header>
 
       <header class="hero">
@@ -461,12 +481,28 @@ function handleCategoryClick(cat) {
   opacity: 0.75;
 }
 
-/* ===== Categories grid ===== */
+/* ===== Category grid ===== */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 24px;
   justify-content: center;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
 }
 
 .catCard {
@@ -475,6 +511,26 @@ function handleCategoryClick(cat) {
   margin: 0 auto;
 }
 
+/* MOBILE */
+@media (max-width: 600px) {
+  .catCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .iconBox {
+    height: 72px;
+  }
+
+  .emoji {
+    font-size: 24px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+}
 
 .catCard {
   background: transparent;
@@ -605,7 +661,60 @@ function handleCategoryClick(cat) {
   color: var(--text-secondary);
 }
 
-/* ===== NEW SEARCH BAR STYLES (ADD THIS BLOCK) ===== */
+.menuBtn {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 24px;
+  cursor: pointer;
+  color: #2f3e36;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  right: 24px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 200px;
+  z-index: 999;
+}
+
+.mobileNavLink {
+  text-decoration: none;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2f3e36;
+  padding: 6px 4px;
+}
+
+.mobileLanguageSelect {
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .desktopNav {
+    display: none;
+  }
+
+  .menuBtn {
+    display: block;
+  }
+
+  .topbar {
+    position: relative;
+  }
+}
+
 .searchPill {
   flex: 1;
   min-width: 260px;
